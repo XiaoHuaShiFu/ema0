@@ -1,8 +1,5 @@
 package com.ema.controller.portal;
 
-import com.ema.dao.UserMapper;
-import com.ema.pojo.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
