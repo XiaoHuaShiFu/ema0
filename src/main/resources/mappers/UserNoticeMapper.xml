@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ema.dao.UserNoticeMapper" >
+  <resultMap id="BaseResultMap" type="com.ema.pojo.UserNotice" >
+    <constructor >
+      <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="user_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="type" jdbcType="SMALLINT" javaType="java.lang.Short" />
+      <arg column="notice_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+      <arg column="title" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="content" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="incident_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="follower_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="commenter_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="incident_scnd_comment_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="create_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+      <arg column="update_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, user_id, type, notice_time, title, content, incident_id, follower_id, commenter_id, 
+    incident_scnd_comment_id, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from user_notice
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from user_notice
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.ema.pojo.UserNotice" >
+    insert into user_notice (id, user_id, type, 
+      notice_time, title, content, 
+      incident_id, follower_id, commenter_id, 
+      incident_scnd_comment_id, create_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{type,jdbcType=SMALLINT}, 
+      #{noticeTime,jdbcType=TIMESTAMP}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, 
+      #{incidentId,jdbcType=INTEGER}, #{followerId,jdbcType=INTEGER}, #{commenterId,jdbcType=INTEGER}, 
+      #{incidentScndCommentId,jdbcType=INTEGER}, now()
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ema.pojo.UserNotice" >
+    insert into user_notice
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="noticeTime != null" >
+        notice_time,
+      </if>
+      <if test="title != null" >
+        title,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+      <if test="incidentId != null" >
+        incident_id,
+      </if>
+      <if test="followerId != null" >
+        follower_id,
+      </if>
+      <if test="commenterId != null" >
+        commenter_id,
+      </if>
+      <if test="incidentScndCommentId != null" >
+        incident_scnd_comment_id,
+      </if>
+        create_time
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=SMALLINT},
+      </if>
+      <if test="noticeTime != null" >
+        #{noticeTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="title != null" >
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="incidentId != null" >
+        #{incidentId,jdbcType=INTEGER},
+      </if>
+      <if test="followerId != null" >
+        #{followerId,jdbcType=INTEGER},
+      </if>
+      <if test="commenterId != null" >
+        #{commenterId,jdbcType=INTEGER},
+      </if>
+      <if test="incidentScndCommentId != null" >
+        #{incidentScndCommentId,jdbcType=INTEGER},
+      </if>
+      now()
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ema.pojo.UserNotice" >
+    update user_notice
+    <set >
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=SMALLINT},
+      </if>
+      <if test="noticeTime != null" >
+        notice_time = #{noticeTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="title != null" >
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="incidentId != null" >
+        incident_id = #{incidentId,jdbcType=INTEGER},
+      </if>
+      <if test="followerId != null" >
+        follower_id = #{followerId,jdbcType=INTEGER},
+      </if>
+      <if test="commenterId != null" >
+        commenter_id = #{commenterId,jdbcType=INTEGER},
+      </if>
+      <if test="incidentScndCommentId != null" >
+        incident_scnd_comment_id = #{incidentScndCommentId,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ema.pojo.UserNotice" >
+    update user_notice
+    set user_id = #{userId,jdbcType=INTEGER},
+      type = #{type,jdbcType=SMALLINT},
+      notice_time = #{noticeTime,jdbcType=TIMESTAMP},
+      title = #{title,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR},
+      incident_id = #{incidentId,jdbcType=INTEGER},
+      follower_id = #{followerId,jdbcType=INTEGER},
+      commenter_id = #{commenterId,jdbcType=INTEGER},
+      incident_scnd_comment_id = #{incidentScndCommentId,jdbcType=INTEGER},
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ema.dao.IncidentCommentMapper" >
+  <resultMap id="BaseResultMap" type="com.ema.pojo.IncidentComment" >
+    <constructor >
+      <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="user_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="incident_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="anon" jdbcType="BIT" javaType="java.lang.Boolean" />
+      <arg column="comment" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="comments" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="collections" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="thumb_ups" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="comment_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+      <arg column="main_image_url" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="create_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+      <arg column="update_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, user_id, incident_id, anon, comment, comments, collections, thumb_ups, comment_time, 
+    main_image_url, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from incident_comment
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from incident_comment
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.ema.pojo.IncidentComment" >
+    insert into incident_comment (id, user_id, incident_id, 
+      anon, comment, comments, 
+      collections, thumb_ups, comment_time, 
+      main_image_url, create_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{incidentId,jdbcType=INTEGER}, 
+      #{anon,jdbcType=BIT}, #{comment,jdbcType=VARCHAR}, #{comments,jdbcType=INTEGER}, 
+      #{collections,jdbcType=INTEGER}, #{thumbUps,jdbcType=INTEGER}, #{commentTime,jdbcType=TIMESTAMP}, 
+      #{mainImageUrl,jdbcType=VARCHAR}, now()
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ema.pojo.IncidentComment" >
+    insert into incident_comment
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="incidentId != null" >
+        incident_id,
+      </if>
+      <if test="anon != null" >
+        anon,
+      </if>
+      <if test="comment != null" >
+        comment,
+      </if>
+      <if test="comments != null" >
+        comments,
+      </if>
+      <if test="collections != null" >
+        collections,
+      </if>
+      <if test="thumbUps != null" >
+        thumb_ups,
+      </if>
+      <if test="commentTime != null" >
+        comment_time,
+      </if>
+      <if test="mainImageUrl != null" >
+        main_image_url,
+      </if>
+      create_time
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="incidentId != null" >
+        #{incidentId,jdbcType=INTEGER},
+      </if>
+      <if test="anon != null" >
+        #{anon,jdbcType=BIT},
+      </if>
+      <if test="comment != null" >
+        #{comment,jdbcType=VARCHAR},
+      </if>
+      <if test="comments != null" >
+        #{comments,jdbcType=INTEGER},
+      </if>
+      <if test="collections != null" >
+        #{collections,jdbcType=INTEGER},
+      </if>
+      <if test="thumbUps != null" >
+        #{thumbUps,jdbcType=INTEGER},
+      </if>
+      <if test="commentTime != null" >
+        #{commentTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="mainImageUrl != null" >
+        #{mainImageUrl,jdbcType=VARCHAR},
+      </if>
+      now()
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ema.pojo.IncidentComment" >
+    update incident_comment
+    <set >
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="incidentId != null" >
+        incident_id = #{incidentId,jdbcType=INTEGER},
+      </if>
+      <if test="anon != null" >
+        anon = #{anon,jdbcType=BIT},
+      </if>
+      <if test="comment != null" >
+        comment = #{comment,jdbcType=VARCHAR},
+      </if>
+      <if test="comments != null" >
+        comments = #{comments,jdbcType=INTEGER},
+      </if>
+      <if test="collections != null" >
+        collections = #{collections,jdbcType=INTEGER},
+      </if>
+      <if test="thumbUps != null" >
+        thumb_ups = #{thumbUps,jdbcType=INTEGER},
+      </if>
+      <if test="commentTime != null" >
+        comment_time = #{commentTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="mainImageUrl != null" >
+        main_image_url = #{mainImageUrl,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ema.pojo.IncidentComment" >
+    update incident_comment
+    set user_id = #{userId,jdbcType=INTEGER},
+      incident_id = #{incidentId,jdbcType=INTEGER},
+      anon = #{anon,jdbcType=BIT},
+      comment = #{comment,jdbcType=VARCHAR},
+      comments = #{comments,jdbcType=INTEGER},
+      collections = #{collections,jdbcType=INTEGER},
+      thumb_ups = #{thumbUps,jdbcType=INTEGER},
+      comment_time = #{commentTime,jdbcType=TIMESTAMP},
+      main_image_url = #{mainImageUrl,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

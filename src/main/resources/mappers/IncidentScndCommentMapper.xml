@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ema.dao.IncidentScndCommentMapper" >
+  <resultMap id="BaseResultMap" type="com.ema.pojo.IncidentScndComment" >
+    <constructor >
+      <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="user_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="incident_comment_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="par_scnd_comment_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="comment" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="thumb_ups" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="comment_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+      <arg column="create_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+      <arg column="update_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, user_id, incident_comment_id, par_scnd_comment_id, comment, thumb_ups, comment_time,
+    create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from incident_scnd_comment
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from incident_scnd_comment
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.ema.pojo.IncidentScndComment" >
+    insert into incident_scnd_comment (id, user_id, incident_comment_id, 
+      par_scnd_comment_id, comment, thumb_ups, 
+      comment_time, create_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{incidentCommentId,jdbcType=INTEGER}, 
+      #{parScndCommentId,jdbcType=INTEGER}, #{comment,jdbcType=VARCHAR}, #{thumbUps,jdbcType=INTEGER}, 
+      #{commentTime,jdbcType=TIMESTAMP}, now()
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ema.pojo.IncidentScndComment" >
+    insert into incident_scnd_comment
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="incidentCommentId != null" >
+        incident_comment_id,
+      </if>
+      <if test="parScndCommentId != null" >
+        par_scnd_comment_id,
+      </if>
+      <if test="comment != null" >
+        comment,
+      </if>
+      <if test="thumbUps != null" >
+        thumb_ups,
+      </if>
+      <if test="commentTime != null" >
+        comment_time,
+      </if>
+      create_time
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="incidentCommentId != null" >
+        #{incidentCommentId,jdbcType=INTEGER},
+      </if>
+      <if test="parScndCommentId != null" >
+        #{parScndCommentId,jdbcType=INTEGER},
+      </if>
+      <if test="comment != null" >
+        #{comment,jdbcType=VARCHAR},
+      </if>
+      <if test="thumbUps != null" >
+        #{thumbUps,jdbcType=INTEGER},
+      </if>
+      <if test="commentTime != null" >
+        #{commentTime,jdbcType=TIMESTAMP},
+      </if>
+      now()
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ema.pojo.IncidentScndComment" >
+    update incident_scnd_comment
+    <set >
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="incidentCommentId != null" >
+        incident_comment_id = #{incidentCommentId,jdbcType=INTEGER},
+      </if>
+      <if test="parScndCommentId != null" >
+        par_scnd_comment_id = #{parScndCommentId,jdbcType=INTEGER},
+      </if>
+      <if test="comment != null" >
+        comment = #{comment,jdbcType=VARCHAR},
+      </if>
+      <if test="thumbUps != null" >
+        thumb_ups = #{thumbUps,jdbcType=INTEGER},
+      </if>
+      <if test="commentTime != null" >
+        comment_time = #{commentTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ema.pojo.IncidentScndComment" >
+    update incident_scnd_comment
+    set user_id = #{userId,jdbcType=INTEGER},
+      incident_comment_id = #{incidentCommentId,jdbcType=INTEGER},
+      par_scnd_comment_id = #{parScndCommentId,jdbcType=INTEGER},
+      comment = #{comment,jdbcType=VARCHAR},
+      thumb_ups = #{thumbUps,jdbcType=INTEGER},
+      comment_time = #{commentTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
