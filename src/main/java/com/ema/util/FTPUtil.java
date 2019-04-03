@@ -1,4 +1,4 @@
-package com.scauaie.util;
+package com.ema.util;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.slf4j.Logger;

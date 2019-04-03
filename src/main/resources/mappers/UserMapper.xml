@@ -204,4 +204,26 @@
       views = #{views,jdbcType=INTEGER},
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="selectByOpenid" parameterType="string" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM user
+    WHERE openid=#{openid}
+  </select>
+
+  <select id="selectOpenidById" parameterType="int" resultType="string">
+    SELECT
+    openid
+    FROM user
+    WHERE id = {#id}
+  </select>
+
+  <select id="selectUserCountByOpenid" parameterType="string" resultType="int">
+    SELECT
+    COUNT(1)
+    FROM user
+    WHERE openid=#{openid}
+  </select>
+
 </mapper>
