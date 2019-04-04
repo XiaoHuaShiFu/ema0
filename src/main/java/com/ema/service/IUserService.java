@@ -2,6 +2,7 @@ package com.ema.service;
 
 import com.ema.common.ServerResponse;
 import com.ema.pojo.User;
+import com.ema.pojo.UserFollow;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -23,4 +24,6 @@ public interface IUserService {
     ServerResponse uploadAvatar(String path, MultipartFile avatar, User user);
 
     ServerResponse register(String code, User user);
+
+    ServerResponse follow(User user, UserFollow userFollow);
 }

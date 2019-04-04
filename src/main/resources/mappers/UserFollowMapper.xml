@@ -10,26 +10,22 @@
     </constructor>
   </resultMap>
   <insert id="insert" parameterType="com.ema.pojo.UserFollow" >
-    insert into user_follow (followeder_id, follower_id, create_time)
-    values (#{followederId,jdbcType=INTEGER}, #{followerId,jdbcType=INTEGER}, now())
+    insert into user_follow (followeder_id, follower_id)
+    values (#{followederId,jdbcType=INTEGER}, #{followerId,jdbcType=INTEGER})
   </insert>
-  <insert id="insertSelective" parameterType="com.ema.pojo.UserFollow" >
-    insert into user_follow
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="followederId != null" >
-        followeder_id,
-      </if>
-      <if test="followerId != null" >
-        follower_id,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="followederId != null" >
-        #{followederId,jdbcType=INTEGER},
-      </if>
-      <if test="followerId != null" >
-        #{followerId,jdbcType=INTEGER},
-      </if>
-    </trim>
-  </insert>
+
+  <select id="selectCountByFollowederIdAndFollowerId" parameterType="com.ema.pojo.UserFollow" resultType="int">
+    SELECT
+    COUNT(1)
+    FROM user_follow
+    WHERE followeder_id = #{followederId}
+    AND follower_id = #{followerId}
+  </select>
+
+  <delete id="deleteByFollowederIdAndFollowerId" parameterType="com.ema.pojo.UserFollow" >
+    DELETE
+    FROM user_follow
+    WHERE followeder_id = #{followederId}
+    AND follower_id = #{followerId}
+  </delete>
 </mapper>

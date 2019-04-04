@@ -226,4 +226,39 @@
     WHERE openid=#{openid}
   </select>
 
+  <update id="updateByIdIncrFollowers" parameterType="integer" >
+    UPDATE
+    FROM user
+    SET followers = followers + 1
+    WHERE id = #{id}
+  </update>
+
+  <update id="updateByIdIncrFollowings" parameterType="integer" >
+    UPDATE
+    FROM user
+    SET followings = followings + 1
+    WHERE id = #{id}
+  </update>
+
+  <update id="updateByIdDecrFollowers" parameterType="integer" >
+    UPDATE
+    FROM user
+    SET followers = followers - 1
+    WHERE id = #{id}
+  </update>
+
+  <update id="updateByIdDecrFollowings" parameterType="integer" >
+    UPDATE
+    FROM user
+    SET followings = followings - 1
+    WHERE id = #{id}
+  </update>
+
+  <select id="selectCountById" parameterType="integer" resultType="int" >
+    SELECT
+    COUNT(1)
+    FROM user
+    WHERE id = #{id}
+  </select>
+
 </mapper>

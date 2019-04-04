@@ -4,6 +4,7 @@ import com.ema.common.Const;
 import com.ema.common.ResponseCode;
 import com.ema.common.ServerResponse;
 import com.ema.pojo.User;
+import com.ema.pojo.UserFollow;
 import com.ema.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -70,6 +71,9 @@ public class UserController {
      * 如果状态码为0表示更新成功
      * 如果状态码为1表示更新失败
      * 如果状态码为10表明用户未登录，需要提示用户进行登录
+     *
+     * 注：只能更新phone,email,nickName,gender,avatarUrl
+     *     其中gender可以取值为0，1，2分别为未知，男，女
      *
      * @param session 会话
      * @param user 用户信息列表
@@ -157,6 +161,17 @@ public class UserController {
         }
         String path = request.getSession().getServletContext().getRealPath("upload"); //会创建在webapp文件夹下
         return iUserService.uploadAvatar(path, avatar, sessionUser);
+    }
+
+
+    // TODO: 2019/4/3 未完成，暂时不做 
+    @RequestMapping(value = "follow.do")
+    public ServerResponse follow(HttpSession session, UserFollow userFollow) {
+        User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
+        if (sessionUser == null) {
+            return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+        }
+        return iUserService.follow(sessionUser, userFollow);
     }
 
 }

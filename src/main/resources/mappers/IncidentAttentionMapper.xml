@@ -10,8 +10,8 @@
     </constructor>
   </resultMap>
   <insert id="insert" parameterType="com.ema.pojo.IncidentAttention" >
-    insert into incident_attention (user_id, incident_id, create_time)
-    values (#{userId,jdbcType=INTEGER}, #{incidentId,jdbcType=INTEGER}, now())
+    insert into incident_attention (user_id, incident_id)
+    values (#{userId,jdbcType=INTEGER}, #{incidentId,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.ema.pojo.IncidentAttention" >
     insert into incident_attention
@@ -22,7 +22,6 @@
       <if test="incidentId != null" >
         incident_id,
       </if>
-      create_time
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="userId != null" >
@@ -31,7 +30,6 @@
       <if test="incidentId != null" >
         #{incidentId,jdbcType=INTEGER},
       </if>
-      now()
     </trim>
   </insert>
 </mapper>

@@ -5,5 +5,7 @@ import com.ema.pojo.UserFollow;
 public interface UserFollowMapper {
     int insert(UserFollow record);
 
-    int insertSelective(UserFollow record);
+    int selectCountByFollowederIdAndFollowerId(UserFollow userFollow);
+
+    int deleteByFollowederIdAndFollowerId(UserFollow userFollow);
 }
