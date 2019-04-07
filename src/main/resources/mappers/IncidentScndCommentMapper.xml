@@ -38,7 +38,7 @@
       #{commentTime,jdbcType=TIMESTAMP}, now()
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.ema.pojo.IncidentScndComment" >
+  <insert id="insertSelective" parameterType="com.ema.pojo.IncidentScndComment" useGeneratedKeys="true" keyProperty="id">
     insert into incident_scnd_comment
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -123,4 +123,13 @@
       comment_time = #{commentTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="selectByIncidentCommentId" parameterType="integer" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM incident_scnd_comment
+    WHERE incident_comment_id = #{incidentCommentId}
+    ORDER BY thumb_ups
+  </select>
+
 </mapper>

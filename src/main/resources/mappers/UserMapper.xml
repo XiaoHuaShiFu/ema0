@@ -261,4 +261,29 @@
     WHERE id = #{id}
   </select>
 
+  <select id="selectByIdList" parameterType="integer" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM user
+    WHERE id IN
+      <foreach collection="list" index="index" item="item" open="(" close=")" separator=",">
+        #{item}
+      </foreach>
+  </select>
+
+  <select id="selectByParScndCommentIdList" parameterType="integer" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM user
+    WHERE id IN (
+      SELECT
+      user_id
+      FROM incident_scnd_comment
+      WHERE id IN
+        <foreach collection="list" index="index" item="item" open="(" close=")" separator=",">
+          #{item}
+        </foreach>
+    )
+  </select>
+
 </mapper>

@@ -13,4 +13,6 @@ import com.ema.pojo.User;
  */
 public interface IIncidentScndCommentService {
     ServerResponse saveComment(IncidentScndComment incidentScndComment, User sessionUser);
+
+    ServerResponse getCommentList(Integer commentId, int pageNum, int pageSize);
 }

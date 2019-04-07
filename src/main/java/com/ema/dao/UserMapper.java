@@ -2,6 +2,8 @@ package com.ema.dao;
 
 import com.ema.pojo.User;
 
+import java.util.List;
+
 public interface UserMapper {
     int deleteByPrimaryKey(Integer id);
 
@@ -30,4 +32,8 @@ public interface UserMapper {
     int updateByIdDecrFollowings(Integer id);
 
     int selectCountById(Integer id);
+
+    List<User> selectByIdList(List<Integer> idList);
+
+    List<User> selectByParScndCommentIdList(List<Integer> parScndCommentIdList);
 }
