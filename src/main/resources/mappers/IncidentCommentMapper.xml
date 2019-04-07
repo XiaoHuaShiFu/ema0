@@ -43,7 +43,7 @@
       #{mainImageUrl,jdbcType=VARCHAR}, now()
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.ema.pojo.IncidentComment" >
+  <insert id="insertSelective" parameterType="com.ema.pojo.IncidentComment" useGeneratedKeys="true" keyProperty="id" >
     insert into incident_comment
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >

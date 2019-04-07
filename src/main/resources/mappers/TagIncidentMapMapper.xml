@@ -46,4 +46,14 @@
             </if>
         </trim>
     </insert>
+
+    <insert id="insertByIncidentIdAndTagId" parameterType="map" >
+        INSERT
+        INTO tag_incident_map
+        (i_id, t_id)
+        VALUES
+        <foreach collection="tags" item="item" index="index" separator=",">
+            (#{id,jdbcType=INTEGER}, #{item,jdbcType=INTEGER})
+        </foreach>
+    </insert>
 </mapper>

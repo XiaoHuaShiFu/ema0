@@ -10,6 +10,9 @@
             <arg column="update_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
         </constructor>
     </resultMap>
+    <sql id="Base_Column_List" >
+        id, name, num, create_time, update_time
+    </sql>
     <insert id="insert" parameterType="com.ema.pojo.Tag" >
         insert into tag (id, name, num,
         create_time, update_time)
@@ -64,4 +67,15 @@
         </foreach>
     </select>
 
+    <select id="selectTagListByIncidentId" parameterType="integer" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM tag
+        WHERE id IN (
+            SELECT
+            t_id
+            FROM tag_incident_map
+            WHERE i_id = #{incidentId}
+        )
+    </select>
 </mapper>

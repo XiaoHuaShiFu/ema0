@@ -39,7 +39,7 @@ public class IncidentController {
      * @param session 会话
      * @return 带状态码的响应,如果成功会返回事件的id
      */
-    @RequestMapping(value = "report_incident.do")
+    @RequestMapping(value = "upload_incident.do")
     public ServerResponse uploadIncident(HttpSession session, int[] tags, Incident incident) {
         User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
         if (sessionUser == null) {
@@ -48,12 +48,13 @@ public class IncidentController {
         return iIncidentService.saveIncident(incident, sessionUser, tags);
     }
 
+    @RequestMapping(value = "get_incident.do")
     public ServerResponse getIncident(HttpSession session, int id) {
         User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
         if (sessionUser == null) {
             return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
         }
-        return iIncidentService.getIncident(id, sessionUser);
+        return iIncidentService.getIncident(id);
     }
 
 

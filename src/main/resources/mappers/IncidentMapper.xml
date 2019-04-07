@@ -9,7 +9,6 @@
       <arg column="views" javaType="java.lang.Integer" jdbcType="INTEGER" />
       <arg column="attentions" javaType="java.lang.Integer" jdbcType="INTEGER" />
       <arg column="comments" javaType="java.lang.Integer" jdbcType="INTEGER" />
-      <arg column="tags" javaType="java.lang.String" jdbcType="VARCHAR" />
       <arg column="title" javaType="java.lang.String" jdbcType="VARCHAR" />
       <arg column="occur_time" javaType="java.util.Date" jdbcType="TIMESTAMP" />
       <arg column="address" javaType="java.lang.String" jdbcType="VARCHAR" />
@@ -24,7 +23,7 @@
     </constructor>
   </resultMap>
   <sql id="Base_Column_List">
-    id, user_id, anon, views, attentions, comments, tags, title, occur_time,
+    id, user_id, anon, views, attentions, comments, title, occur_time,
     address, address_name, description, main_image_url, main_video_url, latitude, longitude,
     create_time, update_time
   </sql>
@@ -41,14 +40,14 @@
   <insert id="insert" parameterType="com.ema.pojo.Incident" useGeneratedKeys="true" keyProperty="id">
     insert into incident (id, user_id, anon,
       views, attentions, comments,
-      tags, title, occur_time,
+      title, occur_time,
       address, address_name, description, 
       main_image_url, main_video_url, latitude, 
       longitude
       )
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{anon,jdbcType=BIT}, 
       #{views,jdbcType=INTEGER}, #{attentions,jdbcType=INTEGER}, #{comments,jdbcType=INTEGER},
-      #{tags,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, #{occurTime,jdbcType=TIMESTAMP},
+      #{title,jdbcType=VARCHAR}, #{occurTime,jdbcType=TIMESTAMP},
       #{address,jdbcType=VARCHAR}, #{addressName,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, 
       #{mainImageUrl,jdbcType=VARCHAR}, #{mainVideoUrl,jdbcType=VARCHAR}, #{latitude,jdbcType=REAL}, 
       #{longitude,jdbcType=REAL}
@@ -62,9 +61,6 @@
       </if>
       <if test="anon != null">
         anon,
-      </if>
-      <if test="tags != null">
-        tags,
       </if>
       <if test="title != null">
         title,
@@ -100,9 +96,6 @@
       </if>
       <if test="anon != null">
         #{anon,jdbcType=BIT},
-      </if>
-      <if test="tags != null">
-        #{tags,jdbcType=VARCHAR},
       </if>
       <if test="title != null">
         #{title,jdbcType=VARCHAR},
@@ -151,9 +144,6 @@
       <if test="comments != null">
         comments = #{comments,jdbcType=INTEGER},
       </if>
-      <if test="tags != null">
-        tags = #{tags,jdbcType=VARCHAR},
-      </if>
       <if test="title != null">
         title = #{title,jdbcType=VARCHAR},
       </if>
@@ -191,7 +181,6 @@
       views = #{views,jdbcType=INTEGER},
       attentions = #{attentions,jdbcType=INTEGER},
       comments = #{comments,jdbcType=INTEGER},
-      tags = #{tags,jdbcType=VARCHAR},
       title = #{title,jdbcType=VARCHAR},
       occur_time = #{occurTime,jdbcType=TIMESTAMP},
       address = #{address,jdbcType=VARCHAR},

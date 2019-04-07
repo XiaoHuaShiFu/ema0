@@ -10,4 +10,6 @@ public interface TagMapper {
     int insertSelective(Tag record);
 
     List<String> selectTagListById(int[] tags);
+
+    List<Tag> selectTagListByIncidentId(Integer incidentId);
 }

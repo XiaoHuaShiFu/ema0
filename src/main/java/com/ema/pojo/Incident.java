@@ -15,8 +15,6 @@ public class Incident {
 
     private Integer comments;
 
-    private String tags;
-
     private String title;
 
     private Date occurTime;
@@ -39,14 +37,13 @@ public class Incident {
 
     private Date updateTime;
 
-    public Incident(Integer id, Integer userId, Boolean anon, Integer views, Integer attentions, Integer comments, String tags, String title, Date occurTime, String address, String addressName, String description, String mainImageUrl, String mainVideoUrl, Float latitude, Float longitude, Date createTime, Date updateTime) {
+    public Incident(Integer id, Integer userId, Boolean anon, Integer views, Integer attentions, Integer comments, String title, Date occurTime, String address, String addressName, String description, String mainImageUrl, String mainVideoUrl, Float latitude, Float longitude, Date createTime, Date updateTime) {
         this.id = id;
         this.userId = userId;
         this.anon = anon;
         this.views = views;
         this.attentions = attentions;
         this.comments = comments;
-        this.tags = tags;
         this.title = title;
         this.occurTime = occurTime;
         this.address = address;
@@ -110,14 +107,6 @@ public class Incident {
 
     public void setComments(Integer comments) {
         this.comments = comments;
-    }
-
-    public String getTags() {
-        return tags;
-    }
-
-    public void setTags(String tags) {
-        this.tags = tags == null ? null : tags.trim();
     }
 
     public String getTitle() {

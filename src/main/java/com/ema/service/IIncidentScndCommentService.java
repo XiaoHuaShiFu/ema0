@@ -1,0 +1,16 @@
+package com.ema.service;
+
+import com.ema.common.ServerResponse;
+import com.ema.pojo.IncidentScndComment;
+import com.ema.pojo.User;
+
+/**
+ * 描述:
+ *
+ * @author xhsf
+ * @email 827032783@qq.com
+ * @create 2019-04-07 21:59
+ */
+public interface IIncidentScndCommentService {
+    ServerResponse saveComment(IncidentScndComment incidentScndComment, User sessionUser);
+}

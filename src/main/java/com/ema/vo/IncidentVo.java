@@ -1,11 +1,13 @@
 package com.ema.vo;
 
-import java.util.Date;
+import com.ema.pojo.Tag;
+
+import java.util.List;
 
 public class IncidentVo {
     private Integer id;
 
-    private Integer userId;
+    private UserVo userVo;
 
     private Boolean anon;
 
@@ -15,11 +17,11 @@ public class IncidentVo {
 
     private Integer comments;
 
-    private String tags;
+    private List<TagVo> tagVoList;
 
     private String title;
 
-    private Date occurTime;
+    private String occurTime;
 
     private String address;
 
@@ -35,35 +37,6 @@ public class IncidentVo {
 
     private Float longitude;
 
-    private Date createTime;
-
-    private Date updateTime;
-
-    public IncidentVo(Integer id, Integer userId, Boolean anon, Integer views, Integer attentions, Integer comments, String tags, String title, Date occurTime, String address, String addressName, String description, String mainImageUrl, String mainVideoUrl, Float latitude, Float longitude, Date createTime, Date updateTime) {
-        this.id = id;
-        this.userId = userId;
-        this.anon = anon;
-        this.views = views;
-        this.attentions = attentions;
-        this.comments = comments;
-        this.tags = tags;
-        this.title = title;
-        this.occurTime = occurTime;
-        this.address = address;
-        this.addressName = addressName;
-        this.description = description;
-        this.mainImageUrl = mainImageUrl;
-        this.mainVideoUrl = mainVideoUrl;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.createTime = createTime;
-        this.updateTime = updateTime;
-    }
-
-    public IncidentVo() {
-        super();
-    }
-
     public Integer getId() {
         return id;
     }
@@ -72,12 +45,12 @@ public class IncidentVo {
         this.id = id;
     }
 
-    public Integer getUserId() {
-        return userId;
+    public UserVo getUserVo() {
+        return userVo;
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    public void setUserVo(UserVo userVo) {
+        this.userVo = userVo;
     }
 
     public Boolean getAnon() {
@@ -112,12 +85,12 @@ public class IncidentVo {
         this.comments = comments;
     }
 
-    public String getTags() {
-        return tags;
+    public List<TagVo> getTagVoList() {
+        return tagVoList;
     }
 
-    public void setTags(String tags) {
-        this.tags = tags == null ? null : tags.trim();
+    public void setTagVoList(List<TagVo> tagVoList) {
+        this.tagVoList = tagVoList;
     }
 
     public String getTitle() {
@@ -125,14 +98,14 @@ public class IncidentVo {
     }
 
     public void setTitle(String title) {
-        this.title = title == null ? null : title.trim();
+        this.title = title;
     }
 
-    public Date getOccurTime() {
+    public String getOccurTime() {
         return occurTime;
     }
 
-    public void setOccurTime(Date occurTime) {
+    public void setOccurTime(String occurTime) {
         this.occurTime = occurTime;
     }
 
@@ -141,7 +114,7 @@ public class IncidentVo {
     }
 
     public void setAddress(String address) {
-        this.address = address == null ? null : address.trim();
+        this.address = address;
     }
 
     public String getAddressName() {
@@ -149,7 +122,7 @@ public class IncidentVo {
     }
 
     public void setAddressName(String addressName) {
-        this.addressName = addressName == null ? null : addressName.trim();
+        this.addressName = addressName;
     }
 
     public String getDescription() {
@@ -157,7 +130,7 @@ public class IncidentVo {
     }
 
     public void setDescription(String description) {
-        this.description = description == null ? null : description.trim();
+        this.description = description;
     }
 
     public String getMainImageUrl() {
@@ -165,7 +138,7 @@ public class IncidentVo {
     }
 
     public void setMainImageUrl(String mainImageUrl) {
-        this.mainImageUrl = mainImageUrl == null ? null : mainImageUrl.trim();
+        this.mainImageUrl = mainImageUrl;
     }
 
     public String getMainVideoUrl() {
@@ -173,7 +146,7 @@ public class IncidentVo {
     }
 
     public void setMainVideoUrl(String mainVideoUrl) {
-        this.mainVideoUrl = mainVideoUrl == null ? null : mainVideoUrl.trim();
+        this.mainVideoUrl = mainVideoUrl;
     }
 
     public Float getLatitude() {
@@ -190,21 +163,5 @@ public class IncidentVo {
 
     public void setLongitude(Float longitude) {
         this.longitude = longitude;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
     }
 }
