@@ -76,5 +76,7 @@
         <!--<table tableName="incident_comment" domainObjectName="IncidentComment" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"/>-->
         <!--<table tableName="incident_comment_collection" domainObjectName="IncidentCommentCollection" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"/>-->
         <!--<table tableName="incident_scnd_comment" domainObjectName="IncidentScndComment" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"/>-->
+        <!--<table tableName="tag" domainObjectName="Tag" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"/>-->
+        <!--<table tableName="tag_incident_map" domainObjectName="TagIncidentMap" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"/>-->
     </context>
 </generatorConfiguration>

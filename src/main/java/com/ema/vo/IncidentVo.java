@@ -1,8 +1,8 @@
-package com.ema.pojo;
+package com.ema.vo;
 
 import java.util.Date;
 
-public class Incident {
+public class IncidentVo {
     private Integer id;
 
     private Integer userId;
@@ -39,7 +39,7 @@ public class Incident {
 
     private Date updateTime;
 
-    public Incident(Integer id, Integer userId, Boolean anon, Integer views, Integer attentions, Integer comments, String tags, String title, Date occurTime, String address, String addressName, String description, String mainImageUrl, String mainVideoUrl, Float latitude, Float longitude, Date createTime, Date updateTime) {
+    public IncidentVo(Integer id, Integer userId, Boolean anon, Integer views, Integer attentions, Integer comments, String tags, String title, Date occurTime, String address, String addressName, String description, String mainImageUrl, String mainVideoUrl, Float latitude, Float longitude, Date createTime, Date updateTime) {
         this.id = id;
         this.userId = userId;
         this.anon = anon;
@@ -60,7 +60,7 @@ public class Incident {
         this.updateTime = updateTime;
     }
 
-    public Incident() {
+    public IncidentVo() {
         super();
     }
 

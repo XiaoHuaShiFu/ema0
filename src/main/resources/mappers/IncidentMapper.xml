@@ -1,223 +1,197 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.ema.dao.IncidentMapper" >
-  <resultMap id="BaseResultMap" type="com.ema.pojo.Incident" >
-    <constructor >
-      <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer" />
-      <arg column="user_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
-      <arg column="anon" jdbcType="BIT" javaType="java.lang.Boolean" />
-      <arg column="views" jdbcType="INTEGER" javaType="java.lang.Integer" />
-      <arg column="attentions" jdbcType="INTEGER" javaType="java.lang.Integer" />
-      <arg column="comments" jdbcType="INTEGER" javaType="java.lang.Integer" />
-      <arg column="type_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
-      <arg column="title" jdbcType="VARCHAR" javaType="java.lang.String" />
-      <arg column="occur_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
-      <arg column="address" jdbcType="VARCHAR" javaType="java.lang.String" />
-      <arg column="address_name" jdbcType="VARCHAR" javaType="java.lang.String" />
-      <arg column="description" jdbcType="VARCHAR" javaType="java.lang.String" />
-      <arg column="main_image_url" jdbcType="VARCHAR" javaType="java.lang.String" />
-      <arg column="main_video_url" jdbcType="VARCHAR" javaType="java.lang.String" />
-      <arg column="latitude" jdbcType="REAL" javaType="java.lang.Float" />
-      <arg column="longitude" jdbcType="REAL" javaType="java.lang.Float" />
-      <arg column="create_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
-      <arg column="update_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ema.dao.IncidentMapper">
+  <resultMap id="BaseResultMap" type="com.ema.pojo.Incident">
+    <constructor>
+      <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="user_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="anon" javaType="java.lang.Boolean" jdbcType="BIT" />
+      <arg column="views" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="attentions" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="comments" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="tags" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="title" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="occur_time" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="address" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="address_name" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="description" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="main_image_url" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="main_video_url" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="latitude" javaType="java.lang.Float" jdbcType="REAL" />
+      <arg column="longitude" javaType="java.lang.Float" jdbcType="REAL" />
+      <arg column="create_time" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="update_time" javaType="java.util.Date" jdbcType="TIMESTAMP" />
     </constructor>
   </resultMap>
-  <sql id="Base_Column_List" >
-    id, user_id, anon, views, attentions, comments, type_id, title, occur_time,
+  <sql id="Base_Column_List">
+    id, user_id, anon, views, attentions, comments, tags, title, occur_time,
     address, address_name, description, main_image_url, main_video_url, latitude, longitude,
     create_time, update_time
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from incident
     where id = #{id,jdbcType=INTEGER}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from incident
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.ema.pojo.Incident" >
-    insert into incident (id, user_id, anon, 
+  <insert id="insert" parameterType="com.ema.pojo.Incident" useGeneratedKeys="true" keyProperty="id">
+    insert into incident (id, user_id, anon,
       views, attentions, comments,
-      type_id, title, occur_time, 
+      tags, title, occur_time,
       address, address_name, description, 
       main_image_url, main_video_url, latitude, 
-      longitude, create_time
+      longitude
       )
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{anon,jdbcType=BIT}, 
       #{views,jdbcType=INTEGER}, #{attentions,jdbcType=INTEGER}, #{comments,jdbcType=INTEGER},
-      #{typeId,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, #{occurTime,jdbcType=TIMESTAMP}, 
+      #{tags,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, #{occurTime,jdbcType=TIMESTAMP},
       #{address,jdbcType=VARCHAR}, #{addressName,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, 
       #{mainImageUrl,jdbcType=VARCHAR}, #{mainVideoUrl,jdbcType=VARCHAR}, #{latitude,jdbcType=REAL}, 
-      #{longitude,jdbcType=REAL}, now()
+      #{longitude,jdbcType=REAL}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.ema.pojo.Incident" >
+  <insert id="insertSelective" parameterType="com.ema.pojo.Incident" useGeneratedKeys="true" keyProperty="id">
     insert into incident
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        id,
-      </if>
-      <if test="userId != null" >
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
         user_id,
       </if>
-      <if test="anon != null" >
+      <if test="anon != null">
         anon,
       </if>
-      <if test="views != null" >
-        views,
+      <if test="tags != null">
+        tags,
       </if>
-      <if test="attentions != null" >
-        attentions,
-      </if>
-      <if test="comments != null" >
-        comments,
-      </if>
-      <if test="typeId != null" >
-        type_id,
-      </if>
-      <if test="title != null" >
+      <if test="title != null">
         title,
       </if>
-      <if test="occurTime != null" >
+      <if test="occurTime != null">
         occur_time,
       </if>
-      <if test="address != null" >
+      <if test="address != null">
         address,
       </if>
-      <if test="addressName != null" >
+      <if test="addressName != null">
         address_name,
       </if>
-      <if test="description != null" >
+      <if test="description != null">
         description,
       </if>
-      <if test="mainImageUrl != null" >
+      <if test="mainImageUrl != null">
         main_image_url,
       </if>
-      <if test="mainVideoUrl != null" >
+      <if test="mainVideoUrl != null">
         main_video_url,
       </if>
-      <if test="latitude != null" >
+      <if test="latitude != null">
         latitude,
       </if>
-      <if test="longitude != null" >
+      <if test="longitude != null">
         longitude,
       </if>
-        create_time
     </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        #{id,jdbcType=INTEGER},
-      </if>
-      <if test="userId != null" >
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
         #{userId,jdbcType=INTEGER},
       </if>
-      <if test="anon != null" >
+      <if test="anon != null">
         #{anon,jdbcType=BIT},
       </if>
-      <if test="views != null" >
-        #{views,jdbcType=INTEGER},
+      <if test="tags != null">
+        #{tags,jdbcType=VARCHAR},
       </if>
-      <if test="attentions != null" >
-        #{attentions,jdbcType=INTEGER},
-      </if>
-      <if test="comments != null" >
-        #{comments,jdbcType=INTEGER},
-      </if>
-      <if test="typeId != null" >
-        #{typeId,jdbcType=INTEGER},
-      </if>
-      <if test="title != null" >
+      <if test="title != null">
         #{title,jdbcType=VARCHAR},
       </if>
-      <if test="occurTime != null" >
+      <if test="occurTime != null">
         #{occurTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="address != null" >
+      <if test="address != null">
         #{address,jdbcType=VARCHAR},
       </if>
-      <if test="addressName != null" >
+      <if test="addressName != null">
         #{addressName,jdbcType=VARCHAR},
       </if>
-      <if test="description != null" >
+      <if test="description != null">
         #{description,jdbcType=VARCHAR},
       </if>
-      <if test="mainImageUrl != null" >
+      <if test="mainImageUrl != null">
         #{mainImageUrl,jdbcType=VARCHAR},
       </if>
-      <if test="mainVideoUrl != null" >
+      <if test="mainVideoUrl != null">
         #{mainVideoUrl,jdbcType=VARCHAR},
       </if>
-      <if test="latitude != null" >
+      <if test="latitude != null">
         #{latitude,jdbcType=REAL},
       </if>
-      <if test="longitude != null" >
+      <if test="longitude != null">
         #{longitude,jdbcType=REAL},
       </if>
-        now()
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ema.pojo.Incident" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.ema.pojo.Incident">
     update incident
-    <set >
-      <if test="userId != null" >
+    <set>
+      <if test="userId != null">
         user_id = #{userId,jdbcType=INTEGER},
       </if>
-      <if test="anon != null" >
+      <if test="anon != null">
         anon = #{anon,jdbcType=BIT},
       </if>
-      <if test="views != null" >
+      <if test="views != null">
         views = #{views,jdbcType=INTEGER},
       </if>
-      <if test="attentions != null" >
+      <if test="attentions != null">
         attentions = #{attentions,jdbcType=INTEGER},
       </if>
-      <if test="comments != null" >
+      <if test="comments != null">
         comments = #{comments,jdbcType=INTEGER},
       </if>
-      <if test="typeId != null" >
-        type_id = #{typeId,jdbcType=INTEGER},
+      <if test="tags != null">
+        tags = #{tags,jdbcType=VARCHAR},
       </if>
-      <if test="title != null" >
+      <if test="title != null">
         title = #{title,jdbcType=VARCHAR},
       </if>
-      <if test="occurTime != null" >
+      <if test="occurTime != null">
         occur_time = #{occurTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="address != null" >
+      <if test="address != null">
         address = #{address,jdbcType=VARCHAR},
       </if>
-      <if test="addressName != null" >
+      <if test="addressName != null">
         address_name = #{addressName,jdbcType=VARCHAR},
       </if>
-      <if test="description != null" >
+      <if test="description != null">
         description = #{description,jdbcType=VARCHAR},
       </if>
-      <if test="mainImageUrl != null" >
+      <if test="mainImageUrl != null">
         main_image_url = #{mainImageUrl,jdbcType=VARCHAR},
       </if>
-      <if test="mainVideoUrl != null" >
+      <if test="mainVideoUrl != null">
         main_video_url = #{mainVideoUrl,jdbcType=VARCHAR},
       </if>
-      <if test="latitude != null" >
+      <if test="latitude != null">
         latitude = #{latitude,jdbcType=REAL},
       </if>
-      <if test="longitude != null" >
+      <if test="longitude != null">
         longitude = #{longitude,jdbcType=REAL},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.ema.pojo.Incident" >
+  <update id="updateByPrimaryKey" parameterType="com.ema.pojo.Incident">
     update incident
     set user_id = #{userId,jdbcType=INTEGER},
       anon = #{anon,jdbcType=BIT},
       views = #{views,jdbcType=INTEGER},
       attentions = #{attentions,jdbcType=INTEGER},
       comments = #{comments,jdbcType=INTEGER},
-      type_id = #{typeId,jdbcType=INTEGER},
+      tags = #{tags,jdbcType=VARCHAR},
       title = #{title,jdbcType=VARCHAR},
       occur_time = #{occurTime,jdbcType=TIMESTAMP},
       address = #{address,jdbcType=VARCHAR},

@@ -12,5 +12,7 @@ import com.ema.pojo.User;
  * @create 2019-04-03 23:48
  */
 public interface IIncidentService {
-    ServerResponse saveIncident(Incident incident, User user);
+    ServerResponse saveIncident(Incident incident, User user, int[] tags);
+
+    ServerResponse getIncident(int id, User user);
 }

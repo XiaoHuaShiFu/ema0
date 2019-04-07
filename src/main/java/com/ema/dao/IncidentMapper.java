@@ -3,11 +3,11 @@ package com.ema.dao;
 import com.ema.pojo.Incident;
 
 public interface IncidentMapper {
-    int deleteByPrimaryKey(Integer id);
-
     int insert(Incident record);
 
     int insertSelective(Incident record);
+
+    int deleteByPrimaryKey(Integer id);
 
     Incident selectByPrimaryKey(Integer id);
 

@@ -7,12 +7,13 @@ import com.ema.pojo.Incident;
 import com.ema.pojo.User;
 import com.ema.service.IIncidentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * 描述:
@@ -29,19 +30,30 @@ public class IncidentController {
     private IIncidentService iIncidentService;
 
     /**
-     * 上报事件
+     * 上传事件
+     * 状态码0表示保存事件成功
+     * 状态码1表示保存事件失败
      *
-     * @param session 会话
      * @param incident 事件pojo
-     * @return
+     * @param tags 标签id数组
+     * @param session 会话
+     * @return 带状态码的响应,如果成功会返回事件的id
      */
     @RequestMapping(value = "report_incident.do")
-    public ServerResponse reportIncident(HttpSession session, Incident incident) {
+    public ServerResponse uploadIncident(HttpSession session, int[] tags, Incident incident) {
         User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
         if (sessionUser == null) {
             return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
         }
-        return iIncidentService.saveIncident(incident, sessionUser);
+        return iIncidentService.saveIncident(incident, sessionUser, tags);
+    }
+
+    public ServerResponse getIncident(HttpSession session, int id) {
+        User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
+        if (sessionUser == null) {
+            return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+        }
+        return iIncidentService.getIncident(id, sessionUser);
     }
 
 
