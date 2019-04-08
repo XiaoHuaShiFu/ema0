@@ -3,6 +3,9 @@ package com.ema.service;
 import com.ema.common.ServerResponse;
 import com.ema.pojo.IncidentComment;
 import com.ema.pojo.User;
+import com.ema.vo.IncidentScndCommentVo;
+
+import java.util.List;
 
 /**
  * 描述:
@@ -14,5 +17,7 @@ import com.ema.pojo.User;
 public interface IIncidentCommentService {
     ServerResponse saveComment(IncidentComment incidentComment, User sessionUser);
 
-    ServerResponse getComment(int id);
+    ServerResponse getComment(int id, User user);
+
+
 }

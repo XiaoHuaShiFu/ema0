@@ -6,12 +6,13 @@ import com.ema.dao.UserMapper;
 import com.ema.pojo.IncidentComment;
 import com.ema.pojo.User;
 import com.ema.service.IIncidentCommentService;
+import com.ema.service.IIncidentScndCommentService;
 import com.ema.util.DateTimeUtil;
 import com.ema.vo.IncidentCommentVo;
 import com.ema.vo.UserVo;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 
 /**
  * 描述:
@@ -28,6 +29,9 @@ public class IncidentCommentServiceImpl implements IIncidentCommentService{
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private IIncidentScndCommentService iIncidentScndCommentService;
 
     /**
      * 保存一个事件的评论
@@ -60,16 +64,18 @@ public class IncidentCommentServiceImpl implements IIncidentCommentService{
      * 获取事件评论详情
      *
      * @param id 评论id
+     * @param sessionUser 获取本一级评论的用户pojo
      * @return 如果成功返回评论的详细信息
      */
-    public ServerResponse getComment(int id) {
+    public ServerResponse getComment(int id, User sessionUser) {
         IncidentComment incidentComment = incidentCommentMapper.selectByPrimaryKey(id);
         if (incidentComment == null) {
             return ServerResponse.createByError("This incident comment not exist");
         }
         User user = userMapper.selectByPrimaryKey(incidentComment.getUserId());
         IncidentCommentVo incidentCommentVo = assembleIncidentCommentVo(incidentComment, user);
-        // TODO: 2019/4/7 还没有二级封装评论 
+        incidentCommentVo.setIncidentScndCommentVoList(
+                iIncidentScndCommentService.getIncidentScndCommentVoList(sessionUser, 1, 2, id));
         return ServerResponse.createBySuccess(incidentCommentVo);
     }
 

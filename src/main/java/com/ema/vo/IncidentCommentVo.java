@@ -1,5 +1,7 @@
 package com.ema.vo;
 
+import java.util.List;
+
 public class IncidentCommentVo {
     private Integer id;
 
@@ -20,6 +22,8 @@ public class IncidentCommentVo {
     private String commentTime;
 
     private String mainImageUrl;
+
+    private List<IncidentScndCommentVo> incidentScndCommentVoList;
 
     public Integer getId() {
         return id;
@@ -99,5 +103,13 @@ public class IncidentCommentVo {
 
     public void setMainImageUrl(String mainImageUrl) {
         this.mainImageUrl = mainImageUrl;
+    }
+
+    public List<IncidentScndCommentVo> getIncidentScndCommentVoList() {
+        return incidentScndCommentVoList;
+    }
+
+    public void setIncidentScndCommentVoList(List<IncidentScndCommentVo> incidentScndCommentVoList) {
+        this.incidentScndCommentVoList = incidentScndCommentVoList;
     }
 }

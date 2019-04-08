@@ -57,5 +57,8 @@ public class IncidentController {
         return iIncidentService.getIncident(id);
     }
 
-
+    // TODO: 2019/4/9 获取事件的简略列表 
+    // TODO: 2019/4/9 删除一个事件 
+    // TODO: 2019/4/9 更新一个事件 
+    
 }

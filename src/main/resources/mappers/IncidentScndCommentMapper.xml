@@ -137,6 +137,7 @@
     FROM incident_scnd_comment
     WHERE id = #{id}
     AND user_id = #{userId}
+    AND incident_comment_id = #{commentId}
   </delete>
 
   <update id="incrThumbUps" parameterType="map">

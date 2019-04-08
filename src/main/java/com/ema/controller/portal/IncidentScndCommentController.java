@@ -68,15 +68,16 @@ public class IncidentScndCommentController {
      *
      * @param id 二级评论的id
      * @param session 会话
+     * @param commentId 一级评论id
      * @return 返回带状态码的响应
      */
     @RequestMapping(value = "delete.do")
-    public ServerResponse deleteComment(HttpSession session, Integer id) {
+    public ServerResponse deleteComment(HttpSession session, Integer id, Integer commentId) {
         User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
         if (sessionUser == null) {
             return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
         }
-        return iIncidentScndCommentService.deleteComment(id, sessionUser.getId());
+        return iIncidentScndCommentService.deleteComment(id, sessionUser.getId(), commentId);
     }
 
     /**

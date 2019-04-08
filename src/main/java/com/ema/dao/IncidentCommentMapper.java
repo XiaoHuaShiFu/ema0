@@ -14,4 +14,9 @@ public interface IncidentCommentMapper {
     int updateByPrimaryKeySelective(IncidentComment record);
 
     int updateByPrimaryKey(IncidentComment record);
+
+    int incrComments(Integer incidentCommentId);
+
+    int decrComments(Integer incidentCommentId);
+
 }

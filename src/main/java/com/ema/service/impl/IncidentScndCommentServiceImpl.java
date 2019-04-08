@@ -3,9 +3,9 @@ package com.ema.service.impl;
 import com.ema.common.ResponseCode;
 import com.ema.common.ServerResponse;
 import com.ema.dao.ISCThumbUpMapper;
+import com.ema.dao.IncidentCommentMapper;
 import com.ema.dao.IncidentScndCommentMapper;
 import com.ema.dao.UserMapper;
-import com.ema.pojo.Incident;
 import com.ema.pojo.IncidentScndComment;
 import com.ema.pojo.User;
 import com.ema.service.IIncidentScndCommentService;
@@ -36,6 +36,9 @@ public class IncidentScndCommentServiceImpl implements IIncidentScndCommentServi
     private IncidentScndCommentMapper incidentScndCommentMapper;
 
     @Autowired
+    private IncidentCommentMapper incidentCommentMapper;
+
+    @Autowired
     private ISCThumbUpMapper iscThumbUpMapper;
 
     @Autowired
@@ -61,6 +64,10 @@ public class IncidentScndCommentServiceImpl implements IIncidentScndCommentServi
         incidentScndComment.setUserId(null);
         incidentScndComment.setUserId(sessionUser.getId());
         incidentScndCommentMapper.insertSelective(incidentScndComment);
+
+        //一级评论的评论数+1
+        incidentCommentMapper.incrComments(incidentScndComment.getIncidentCommentId());
+
         Map<String,Integer> map = new HashMap<>();
         map.put("id", incidentScndComment.getId());
         return ServerResponse.createBySuccess("save comment success", map);
@@ -82,6 +89,77 @@ public class IncidentScndCommentServiceImpl implements IIncidentScndCommentServi
         if (incidentCommentId == null) {
             return ServerResponse.createByErrorMessage("incident comment id can't be null");
         }
+        //生成分页信息
+        PageInfo<IncidentScndCommentVo> pageResult =
+                new PageInfo<>(getIncidentScndCommentVoList(user, pageNum, pageSize, incidentCommentId));
+        return ServerResponse.createBySuccess(pageResult);
+    }
+
+    /**
+     * 删除一个评论
+     *
+     * @param id 二级评论的id
+     * @param userId 用户的id
+     * @param commentId 一级评论的id
+     * @return 返回带状态码的响应
+     */
+    public ServerResponse deleteComment(Integer id, Integer userId, Integer commentId) {
+        int rowCount = incidentScndCommentMapper.deleteByIdAndUserId(id, userId, commentId);
+        if (rowCount < 1) {
+            return ServerResponse.createByErrorMessage("delete false");
+        }
+
+        //一级评论的评论数-1
+        incidentCommentMapper.decrComments(commentId);
+
+        return ServerResponse.createBySuccess("delete success");
+    }
+
+    /**
+     * 点赞
+     * 如果返回状态码1表明点赞失败
+     * 如果返回状态码280表明点赞成功
+     * 如果返回状态码281表明取消赞成功
+     *
+     * @param id 二级评论id
+     * @param userId 用户id
+     * @return 带状态码的响应
+     */
+    public ServerResponse thumbUpComment(Integer id, Integer userId) {
+        //尝试让点赞数+1，如果此用户没有点赞过此二级评论的话
+        int rowCount = incidentScndCommentMapper.incrThumbUps(id, userId);
+        //如果点赞成功则把点赞的映射对加入数据库
+        if (rowCount >= 1) {
+            iscThumbUpMapper.insert(userId, id);
+            return ServerResponse.create(
+                    ResponseCode.THUMB_UP_SUCCESS.getCode(), ResponseCode.THUMB_UP_SUCCESS.getDesc());
+        }
+
+        //如果点赞失败则表明此次是取消点赞
+        if (rowCount < 1) {
+            //把二级评论的点赞数-1
+            incidentScndCommentMapper.decrThumbUps(id, userId);
+            //并删除点赞映射对
+            iscThumbUpMapper.deleteByUserIdAndISCId(id, userId);
+            return ServerResponse.create(
+                    ResponseCode.CANCEL_THUMB_UP_SUCCESS.getCode(), ResponseCode.CANCEL_THUMB_UP_SUCCESS.getDesc());
+        }
+
+        //点赞失败
+        return ServerResponse.createByErrorMessage("thumb up false");
+    }
+
+
+    /**
+     * 获取事件二级评论列表，带分页
+     *
+     * @param user 获取此列表的用户pojo
+     * @param pageNum 页码
+     * @param pageSize 页条数
+     * @param incidentCommentId 一级评论id
+     * @return IncidentScndCommentVoList
+     */
+    public List<IncidentScndCommentVo> getIncidentScndCommentVoList(User user, int pageNum, int pageSize, Integer incidentCommentId) {
         //开始分页
         PageHelper.startPage(pageNum, pageSize);
         //查询二级评论列表
@@ -125,60 +203,8 @@ public class IncidentScndCommentServiceImpl implements IIncidentScndCommentServi
         List<IncidentScndCommentVo> incidentScndCommentVoList =
                 assembleIncidentScndCommentVoList(incidentScndCommentList, userList,
                         parScndCommentUserList, isThumbUpList);
-        //生成分页信息
-        PageInfo<IncidentScndCommentVo> pageResult = new PageInfo<>(incidentScndCommentVoList);
-        return ServerResponse.createBySuccess(pageResult);
+        return incidentScndCommentVoList;
     }
-
-    /**
-     * 删除一个评论
-     *
-     * @param id 二级评论的id
-     * @param userId 用户的id
-     * @return 返回带状态码的响应
-     */
-    public ServerResponse deleteComment(Integer id, Integer userId) {
-        int rowCount = incidentScndCommentMapper.deleteByIdAndUserId(id, userId);
-        if (rowCount < 1) {
-            return ServerResponse.createByErrorMessage("delete false");
-        }
-        return ServerResponse.createBySuccess("delete success");
-    }
-
-    /**
-     * 点赞
-     * 如果返回状态码1表明点赞失败
-     * 如果返回状态码280表明点赞成功
-     * 如果返回状态码281表明取消赞成功
-     *
-     * @param id 二级评论id
-     * @param userId 用户id
-     * @return 带状态码的响应
-     */
-    public ServerResponse thumbUpComment(Integer id, Integer userId) {
-        //尝试让点赞数+1，如果此用户没有点赞过此二级评论的话
-        int rowCount = incidentScndCommentMapper.incrThumbUps(id, userId);
-        //如果点赞成功则把点赞的映射对加入数据库
-        if (rowCount >= 1) {
-            iscThumbUpMapper.insert(userId, id);
-            return ServerResponse.create(
-                    ResponseCode.THUMB_UP_SUCCESS.getCode(), ResponseCode.THUMB_UP_SUCCESS.getDesc());
-        }
-
-        //如果点赞失败则表明此次是取消点赞
-        if (rowCount < 1) {
-            //把二级评论的点赞数-1
-            incidentScndCommentMapper.decrThumbUps(id, userId);
-            //并删除点赞映射对
-            iscThumbUpMapper.deleteByUserIdAndISCId(id, userId);
-            return ServerResponse.create(
-                    ResponseCode.CANCEL_THUMB_UP_SUCCESS.getCode(), ResponseCode.CANCEL_THUMB_UP_SUCCESS.getDesc());
-        }
-
-        //点赞失败
-        return ServerResponse.createByErrorMessage("thumb up false");
-    }
-
 
     /**
      * 装配IncidentScndCommentVoList

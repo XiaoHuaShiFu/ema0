@@ -158,4 +158,20 @@
       main_image_url = #{mainImageUrl,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+  <update id="incrComments" parameterType="integer">
+    UPDATE
+    incident_comment
+    SET comments = comments + 1
+    WHERE id = #{incidentCommentId}
+  </update>
+
+  <update id="decrComments" parameterType="integer">
+    UPDATE
+    incident_comment
+    SET comments = comments - 1
+    WHERE id = #{incidentCommentId}
+  </update>
+
 </mapper>

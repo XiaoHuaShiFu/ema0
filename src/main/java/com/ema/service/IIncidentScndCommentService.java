@@ -3,6 +3,9 @@ package com.ema.service;
 import com.ema.common.ServerResponse;
 import com.ema.pojo.IncidentScndComment;
 import com.ema.pojo.User;
+import com.ema.vo.IncidentScndCommentVo;
+
+import java.util.List;
 
 /**
  * 描述:
@@ -16,7 +19,9 @@ public interface IIncidentScndCommentService {
 
     ServerResponse getCommentList(Integer commentId, int pageNum, int pageSize, User user);
 
-    ServerResponse deleteComment(Integer id, Integer userId);
+    ServerResponse deleteComment(Integer id, Integer userId, Integer commentId);
 
     ServerResponse thumbUpComment(Integer id, Integer userId);
+
+    List<IncidentScndCommentVo> getIncidentScndCommentVoList(User user, int pageNum, int pageSize, Integer incidentCommentId);
 }

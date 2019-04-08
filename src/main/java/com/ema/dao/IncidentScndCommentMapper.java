@@ -20,7 +20,7 @@ public interface IncidentScndCommentMapper {
 
     List<IncidentScndComment> selectByIncidentCommentId(Integer incidentCommentId);
 
-    int deleteByIdAndUserId(@Param("id") Integer id, @Param("userId") Integer userId);
+    int deleteByIdAndUserId(@Param("id") Integer id, @Param("userId") Integer userId, @Param("commentId") Integer commentId);
 
     int incrThumbUps(@Param("iscId") Integer iscId, @Param("userId") Integer userId);
 
