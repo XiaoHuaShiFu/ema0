@@ -1,6 +1,8 @@
 package com.ema.service.impl;
 
+import com.ema.common.ResponseCode;
 import com.ema.common.ServerResponse;
+import com.ema.dao.ISCThumbUpMapper;
 import com.ema.dao.IncidentScndCommentMapper;
 import com.ema.dao.UserMapper;
 import com.ema.pojo.Incident;
@@ -32,6 +34,9 @@ public class IncidentScndCommentServiceImpl implements IIncidentScndCommentServi
 
     @Autowired
     private IncidentScndCommentMapper incidentScndCommentMapper;
+
+    @Autowired
+    private ISCThumbUpMapper iscThumbUpMapper;
 
     @Autowired
     private UserMapper userMapper;
@@ -69,9 +74,10 @@ public class IncidentScndCommentServiceImpl implements IIncidentScndCommentServi
      * @param incidentCommentId 一级评论id
      * @param pageNum 页码
      * @param pageSize 一页条数
+     * @param user 获取列表的用户
      * @return 返回二级评论列表
      */
-    public ServerResponse getCommentList(Integer incidentCommentId, int pageNum, int pageSize) {
+    public ServerResponse getCommentList(Integer incidentCommentId, int pageNum, int pageSize, User user) {
         //一级评论id不能为null
         if (incidentCommentId == null) {
             return ServerResponse.createByErrorMessage("incident comment id can't be null");
@@ -81,32 +87,98 @@ public class IncidentScndCommentServiceImpl implements IIncidentScndCommentServi
         //查询二级评论列表
         List<IncidentScndComment> incidentScndCommentList =
                 incidentScndCommentMapper.selectByIncidentCommentId(incidentCommentId);
-        System.out.println(incidentScndCommentList);
 
         //获取用户列表
         List<Integer> userIdList = new ArrayList<>();
+        //父二级评论id列表
         List<Integer> parScndCommentIdList = new ArrayList<>();
         for (IncidentScndComment i : incidentScndCommentList) {
             userIdList.add(i.getUserId());
             parScndCommentIdList.add(i.getParScndCommentId());
         }
-        System.out.println(userIdList);
-        System.out.println(parScndCommentIdList);
-        List<User> userList = userMapper.selectByIdList(userIdList);
-        System.out.println(userList.size());
+        List<User> userList = new ArrayList<>();
+        for (Integer i : userIdList) {
+            userList.add(userMapper.selectByPrimaryKey(i));
+        }
 
         //获取父用户列表
-        List<User> parScndCommentUserList = userMapper.selectByParScndCommentIdList(parScndCommentIdList);
-        System.out.println(parScndCommentUserList.size());
+        List<User> parScndCommentUserList = new ArrayList<>();
+        for (Integer i : parScndCommentIdList) {
+            parScndCommentUserList.add(userMapper.selectByParScndCommentId(i));
+        }
+
+        //二级评论点赞状态列表
+        List<Boolean> isThumbUpList = null;
+        if (user != null) {
+            isThumbUpList = new ArrayList<>();
+            for (IncidentScndComment i : incidentScndCommentList) {
+                int rowCount = iscThumbUpMapper.selectCountByUserIdAndISCId(user.getId(), i.getId());
+                if (rowCount >=  1) {
+                    isThumbUpList.add(true);
+                } else {
+                    isThumbUpList.add(false);
+                }
+            }
+        }
 
         //装配IncidentScndCommentVoList
         List<IncidentScndCommentVo> incidentScndCommentVoList =
-                assembleIncidentScndCommentVoList(incidentScndCommentList, userList, parScndCommentUserList);
-        System.out.println(incidentScndCommentVoList);
+                assembleIncidentScndCommentVoList(incidentScndCommentList, userList,
+                        parScndCommentUserList, isThumbUpList);
         //生成分页信息
-        PageInfo pageResult = new PageInfo(incidentScndCommentVoList);
+        PageInfo<IncidentScndCommentVo> pageResult = new PageInfo<>(incidentScndCommentVoList);
         return ServerResponse.createBySuccess(pageResult);
     }
+
+    /**
+     * 删除一个评论
+     *
+     * @param id 二级评论的id
+     * @param userId 用户的id
+     * @return 返回带状态码的响应
+     */
+    public ServerResponse deleteComment(Integer id, Integer userId) {
+        int rowCount = incidentScndCommentMapper.deleteByIdAndUserId(id, userId);
+        if (rowCount < 1) {
+            return ServerResponse.createByErrorMessage("delete false");
+        }
+        return ServerResponse.createBySuccess("delete success");
+    }
+
+    /**
+     * 点赞
+     * 如果返回状态码1表明点赞失败
+     * 如果返回状态码280表明点赞成功
+     * 如果返回状态码281表明取消赞成功
+     *
+     * @param id 二级评论id
+     * @param userId 用户id
+     * @return 带状态码的响应
+     */
+    public ServerResponse thumbUpComment(Integer id, Integer userId) {
+        //尝试让点赞数+1，如果此用户没有点赞过此二级评论的话
+        int rowCount = incidentScndCommentMapper.incrThumbUps(id, userId);
+        //如果点赞成功则把点赞的映射对加入数据库
+        if (rowCount >= 1) {
+            iscThumbUpMapper.insert(userId, id);
+            return ServerResponse.create(
+                    ResponseCode.THUMB_UP_SUCCESS.getCode(), ResponseCode.THUMB_UP_SUCCESS.getDesc());
+        }
+
+        //如果点赞失败则表明此次是取消点赞
+        if (rowCount < 1) {
+            //把二级评论的点赞数-1
+            incidentScndCommentMapper.decrThumbUps(id, userId);
+            //并删除点赞映射对
+            iscThumbUpMapper.deleteByUserIdAndISCId(id, userId);
+            return ServerResponse.create(
+                    ResponseCode.CANCEL_THUMB_UP_SUCCESS.getCode(), ResponseCode.CANCEL_THUMB_UP_SUCCESS.getDesc());
+        }
+
+        //点赞失败
+        return ServerResponse.createByErrorMessage("thumb up false");
+    }
+
 
     /**
      * 装配IncidentScndCommentVoList
@@ -117,13 +189,15 @@ public class IncidentScndCommentServiceImpl implements IIncidentScndCommentServi
      * @return
      */
     private List<IncidentScndCommentVo> assembleIncidentScndCommentVoList(
-            List<IncidentScndComment> incidentScndCommentList, List<User> userList, List<User> parScndCommentUserList) {
+            List<IncidentScndComment> incidentScndCommentList,
+            List<User> userList, List<User> parScndCommentUserList,
+            List<Boolean> isThumbUpList) {
         List<IncidentScndCommentVo> incidentScndCommentVoList = new ArrayList<>();
         for (int i = 0; i < incidentScndCommentList.size(); i++) {
             incidentScndCommentVoList.add(assembleIncidentScndCommentVo(
                     incidentScndCommentList.get(i),
                     userList.get(i),
-                    parScndCommentUserList.get(i)));
+                    parScndCommentUserList.get(i), isThumbUpList != null ? isThumbUpList.get(i) : null));
         }
         return incidentScndCommentVoList;
     }
@@ -137,15 +211,16 @@ public class IncidentScndCommentServiceImpl implements IIncidentScndCommentServi
      * @return
      */
     private IncidentScndCommentVo assembleIncidentScndCommentVo(IncidentScndComment incidentScndComment,
-                                                                User user, User parScndCommentUser) {
+                                                                User user, User parScndCommentUser, Boolean isThumbUp) {
         IncidentScndCommentVo incidentScndCommentVo = new IncidentScndCommentVo();
         incidentScndCommentVo.setId(incidentScndComment.getId());
         incidentScndCommentVo.setUserVo(assembleUserVo(user));
-        incidentScndCommentVo.setParScndCommentUserVo(assembleUserVo0(parScndCommentUser));
+        incidentScndCommentVo.setParScndCommentUserVo(assembleUserVo(parScndCommentUser));
         incidentScndCommentVo.setIncidentCommentId(incidentScndComment.getIncidentCommentId());
         incidentScndCommentVo.setComment(incidentScndComment.getComment());
         incidentScndCommentVo.setThumbUps(incidentScndComment.getThumbUps());
         incidentScndCommentVo.setCommentTime(DateTimeUtil.dateToStr(incidentScndComment.getCommentTime()));
+        incidentScndCommentVo.setThumbUp(isThumbUp != null ? isThumbUp : false);
         return incidentScndCommentVo;
     }
 
@@ -156,6 +231,9 @@ public class IncidentScndCommentServiceImpl implements IIncidentScndCommentServi
      * @return
      */
     private UserVo assembleUserVo(User user) {
+        if (user == null) {
+            return null;
+        }
         UserVo userVo = new UserVo();
         userVo.setId(user.getId());
         userVo.setNickName(user.getNickName());
@@ -163,16 +241,4 @@ public class IncidentScndCommentServiceImpl implements IIncidentScndCommentServi
         return userVo;
     }
 
-    /**
-     * 装配UserVo
-     *
-     * @param user
-     * @return
-     */
-    private UserVo assembleUserVo0(User user) {
-        UserVo userVo = new UserVo();
-        userVo.setId(user.getId());
-        userVo.setAvatarUrl(user.getAvatarUrl());
-        return userVo;
-    }
 }

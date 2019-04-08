@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ema.dao.ISCThumbUpMapper" >
+  <resultMap id="BaseResultMap" type="com.ema.pojo.ISCThumbUp" >
+    <constructor >
+      <arg column="user_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="isc_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="thumb_up_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+    </constructor>
+  </resultMap>
+  <insert id="insert" parameterType="map" >
+    insert
+    into isc_thumb_up
+    (user_id, isc_id)
+    values (#{userId,jdbcType=INTEGER}, #{iscId,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ema.pojo.ISCThumbUp" >
+    insert into isc_thumb_up
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="iscId != null" >
+        isc_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="iscId != null" >
+        #{iscId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+
+  <delete id="deleteByUserIdAndISCId" parameterType="map" >
+    DELETE
+    FROM isc_thumb_up
+    WHERE user_id = #{userId}
+    AND isc_id = #{iscId}
+  </delete>
+
+  <select id="selectCountByUserIdAndISCId" parameterType="map" resultType="int">
+    SELECT
+    COUNT(1)
+    FROM isc_thumb_up
+    WHERE user_id = #{userId}
+    AND isc_id = #{iscId}
+  </select>
+</mapper>

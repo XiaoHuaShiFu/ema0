@@ -132,4 +132,39 @@
     ORDER BY thumb_ups
   </select>
 
+  <delete id="deleteByIdAndUserId" parameterType="map">
+    DELETE
+    FROM incident_scnd_comment
+    WHERE id = #{id}
+    AND user_id = #{userId}
+  </delete>
+
+  <update id="incrThumbUps" parameterType="map">
+    UPDATE
+    incident_scnd_comment
+    SET thumb_ups = thumb_ups + 1
+    WHERE id = #{iscId}
+    AND NOT EXISTS (
+      SELECT
+      id
+      FROM isc_thumb_up
+      WHERE user_id = #{userId}
+      AND isc_id = #{iscId}
+    )
+  </update>
+
+  <update id="decrThumbUps" parameterType="map">
+    UPDATE
+    incident_scnd_comment
+    SET thumb_ups = thumb_ups - 1
+    WHERE id = #{iscId}
+    AND EXISTS (
+      SELECT
+      id
+      FROM isc_thumb_up
+      WHERE user_id = #{userId}
+      AND isc_id = #{iscId}
+    )
+  </update>
+
 </mapper>

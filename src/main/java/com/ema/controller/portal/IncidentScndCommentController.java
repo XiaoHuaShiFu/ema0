@@ -56,10 +56,49 @@ public class IncidentScndCommentController {
      * @return 返回二级评论列表
      */
     @RequestMapping(value = "list.do")
-    public ServerResponse getCommentList(Integer incidentCommentId,
+    public ServerResponse getCommentList(HttpSession session, Integer incidentCommentId,
                                          @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
                                          @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
-        return iIncidentScndCommentService.getCommentList(incidentCommentId, pageNum, pageSize);
+        User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
+        return iIncidentScndCommentService.getCommentList(incidentCommentId, pageNum, pageSize, sessionUser);
+    }
+
+    /**
+     * 删除一个评论
+     *
+     * @param id 二级评论的id
+     * @param session 会话
+     * @return 返回带状态码的响应
+     */
+    @RequestMapping(value = "delete.do")
+    public ServerResponse deleteComment(HttpSession session, Integer id) {
+        User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
+        if (sessionUser == null) {
+            return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+        }
+        return iIncidentScndCommentService.deleteComment(id, sessionUser.getId());
+    }
+
+    /**
+     * 点赞
+     * 如果返回状态码1表明点赞失败
+     * 如果返回状态码10表明用户未登录
+     * 如果返回状态码280表明点赞成功
+     * 如果返回状态码281表明取消赞成功
+     *
+     * 此接口如果已经点赞则取消点赞，未点赞则增加点赞
+     *
+     * @param id 二级评论id
+     * @param session 会话
+     * @return 带状态码的响应
+     */
+    @RequestMapping(value = "thumb_up.do")
+    public ServerResponse thumbUpComment(HttpSession session, Integer id) {
+        User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
+        if (sessionUser == null) {
+            return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+        }
+        return iIncidentScndCommentService.thumbUpComment(sessionUser.getId(),id);
     }
 
 

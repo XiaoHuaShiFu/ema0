@@ -14,5 +14,9 @@ import com.ema.pojo.User;
 public interface IIncidentScndCommentService {
     ServerResponse saveComment(IncidentScndComment incidentScndComment, User sessionUser);
 
-    ServerResponse getCommentList(Integer commentId, int pageNum, int pageSize);
+    ServerResponse getCommentList(Integer commentId, int pageNum, int pageSize, User user);
+
+    ServerResponse deleteComment(Integer id, Integer userId);
+
+    ServerResponse thumbUpComment(Integer id, Integer userId);
 }

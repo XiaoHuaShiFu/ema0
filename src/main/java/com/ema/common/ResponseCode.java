@@ -45,7 +45,10 @@ public enum ResponseCode {
 
 
     UPLOAD_FILE_SUCCESS(233, "UPLOAD_FILE_SUCCESS"), //上传文件成功
-    UPLOAD_FILE_FAIL(234, "UPLOAD_FILE_FAIL"); //上传文件成功
+    UPLOAD_FILE_FAIL(234, "UPLOAD_FILE_FAIL"), //上传文件成功
+
+    THUMB_UP_SUCCESS(280, "THUMB_UP_SUCCESS"), //点赞成功
+    CANCEL_THUMB_UP_SUCCESS(281, "CANCEL_THUMB_UP_SUCCESS"); //取消点赞成功
 
     private final int code;
     private final String desc;

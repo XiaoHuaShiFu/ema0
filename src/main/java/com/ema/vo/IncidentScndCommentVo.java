@@ -13,6 +13,8 @@ public class IncidentScndCommentVo {
 
     private Integer thumbUps;
 
+    private Boolean isThumbUp; //是否已经点赞
+
     private String commentTime;
 
     public Integer getId() {
@@ -69,5 +71,13 @@ public class IncidentScndCommentVo {
 
     public void setCommentTime(String commentTime) {
         this.commentTime = commentTime;
+    }
+
+    public Boolean getThumbUp() {
+        return isThumbUp;
+    }
+
+    public void setThumbUp(Boolean thumbUp) {
+        isThumbUp = thumbUp;
     }
 }

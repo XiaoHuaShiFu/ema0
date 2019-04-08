@@ -33,7 +33,5 @@ public interface UserMapper {
 
     int selectCountById(Integer id);
 
-    List<User> selectByIdList(List<Integer> idList);
-
-    List<User> selectByParScndCommentIdList(List<Integer> parScndCommentIdList);
+    User selectByParScndCommentId(Integer parScndCommentId);
 }
