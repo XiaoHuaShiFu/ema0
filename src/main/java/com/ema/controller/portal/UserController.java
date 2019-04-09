@@ -165,7 +165,7 @@ public class UserController {
     }
 
 
-    // TODO: 2019/4/3 未完成，暂时不做 
+    // TODO: 2019/4/3 follow功能未完成
     @RequestMapping(value = "follow.do")
     public ServerResponse follow(HttpSession session, UserFollow userFollow) {
         User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
@@ -176,4 +176,5 @@ public class UserController {
     }
 
 
+    // TODO: 2019/4/10 用户的通知模块未做
 }
