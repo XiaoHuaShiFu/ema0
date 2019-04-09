@@ -1,7 +1,10 @@
 package com.ema.common;
 
 /**
- * Created by lenovo on 2019/1/31.
+ *
+ * @author xhsf
+ * @email 827032783@qq.com
+ * @create 2019-02-27 20:30
  */
 public final class Const {
 

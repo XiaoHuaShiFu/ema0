@@ -93,6 +93,7 @@ public class UserController {
         return response;
     }
 
+    // TODO: 2019/4/9 这个改成获取别的用户的信息
     /**
      * 获取用户信息，需要用户已经登录
      * 如果状态码为10表明用户未登录，需要提示用户进行登录
@@ -173,5 +174,6 @@ public class UserController {
         }
         return iUserService.follow(sessionUser, userFollow);
     }
+
 
 }

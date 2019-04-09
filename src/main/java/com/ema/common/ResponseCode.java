@@ -1,7 +1,10 @@
 package com.ema.common;
 
 /**
- * Created by lenovo on 2019/1/31.
+ *
+ * @author xhsf
+ * @email 827032783@qq.com
+ * @create 2019-02-27 20:30
  */
 public enum ResponseCode {
 
@@ -48,7 +51,10 @@ public enum ResponseCode {
     UPLOAD_FILE_FAIL(234, "UPLOAD_FILE_FAIL"), //上传文件成功
 
     THUMB_UP_SUCCESS(280, "THUMB_UP_SUCCESS"), //点赞成功
-    CANCEL_THUMB_UP_SUCCESS(281, "CANCEL_THUMB_UP_SUCCESS"); //取消点赞成功
+    CANCEL_THUMB_UP_SUCCESS(281, "CANCEL_THUMB_UP_SUCCESS"), //取消点赞成功
+    ATTENTION_SUCCESS(282, "ATTENTION_SUCCESS"), //关注成功
+    CANCEL_ATTENTION_SUCCESS(283, "CANCEL_ATTENTION_SUCCESS"); //取消关注成功
+
 
     private final int code;
     private final String desc;

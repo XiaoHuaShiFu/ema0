@@ -192,4 +192,74 @@
       longitude = #{longitude,jdbcType=REAL}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <update id="incrComments" parameterType="integer">
+    UPDATE incident
+    SET comments = comments + 1
+    WHERE id = #{incidentId}
+  </update>
+
+  <update id="decrComments" parameterType="integer">
+    UPDATE incident
+    SET comments = comments - 1
+    WHERE id = #{incidentId}
+  </update>
+
+  <delete id="deleteByIdAndUserId" parameterType="map">
+    DELETE
+    FROM incident
+    WHERE id = #{id}
+    AND user_id = #{userId}
+  </delete>
+
+  <select id="selectListOrderByTime" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM incident
+    ORDER BY occur_time
+  </select>
+
+  <select id="selectCountByUserIdAndId" parameterType="map" resultType="int">
+    SELECT
+    COUNT(1)
+    FROM incident
+    WHERE id = #{incidentId}
+    AND user_id = #{userId}
+  </select>
+
+  <update id="incrAttentions" parameterType="map">
+    UPDATE
+    incident
+    SET attentions = attentions + 1
+    WHERE id = #{id}
+    AND NOT EXISTS (
+      SELECT
+      *
+      FROM incident_attention
+      WHERE user_id = #{userId}
+      AND incident_id = #{id}
+    )
+  </update>
+
+  <update id="decrAttentions" parameterType="map">
+    UPDATE
+    incident
+    SET attentions = attentions - 1
+    WHERE id = #{id}
+    AND EXISTS (
+    SELECT
+    *
+    FROM incident_attention
+    WHERE user_id = #{userId}
+    AND incident_id = #{id}
+    )
+  </update>
+
+  <update id="incrViewsByIncidentId" parameterType="map" >
+    UPDATE
+    incident
+    SET views = views + 1
+    WHERE id = #{incidentId}
+  </update>
+
 </mapper>

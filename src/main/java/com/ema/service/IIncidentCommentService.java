@@ -3,7 +3,7 @@ package com.ema.service;
 import com.ema.common.ServerResponse;
 import com.ema.pojo.IncidentComment;
 import com.ema.pojo.User;
-import com.ema.vo.IncidentScndCommentVo;
+import com.ema.vo.IncidentCommentVo;
 
 import java.util.List;
 
@@ -19,5 +19,9 @@ public interface IIncidentCommentService {
 
     ServerResponse getComment(int id, User user);
 
+    ServerResponse deleteComment(User sessionUser, int id, Integer incidentId);
 
+    ServerResponse getCommentList(Integer incidentId, int pageNum, int pageSize);
+
+    List<IncidentCommentVo> getIncidentCommentVoList(Integer incidentId, int pageNum, int pageSize);
 }

@@ -1,5 +1,7 @@
 package com.ema.service;
 
+import com.ema.common.ServerResponse;
+
 /**
  * 描述:
  *
@@ -8,4 +10,7 @@ package com.ema.service;
  * @create 2019-04-07 13:31
  */
 public interface ITagService {
+    ServerResponse saveTag(String tagName);
+
+    ServerResponse getTagList(int pageNum, int pageSize);
 }

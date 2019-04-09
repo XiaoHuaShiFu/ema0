@@ -65,6 +65,8 @@ public class IncidentScndCommentController {
 
     /**
      * 删除一个评论
+     * 状态码0表示删除成功
+     * 状态码1表示删除失败
      *
      * @param id 二级评论的id
      * @param session 会话

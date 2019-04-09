@@ -1,6 +1,9 @@
 package com.ema.dao;
 
 import com.ema.pojo.Incident;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface IncidentMapper {
     int insert(Incident record);
@@ -14,4 +17,20 @@ public interface IncidentMapper {
     int updateByPrimaryKeySelective(Incident record);
 
     int updateByPrimaryKey(Incident record);
+
+    int incrComments(Integer incidentId);
+
+    int decrComments(Integer incidentId);
+
+    int deleteByIdAndUserId(@Param("userId") Integer userId, @Param("id") Incident id);
+
+    List<Incident> selectListOrderByTime();
+
+    int selectCountByUserIdAndId(@Param("userId") Integer userId, @Param("incidentId") Integer incidentId);
+
+    int incrAttentions(@Param("id") Integer id, @Param("userId") Integer userId);
+
+    int decrAttentions(@Param("id") Integer id, @Param("userId") Integer userId);
+
+    int incrViewsByIncidentId(Integer incidentId);
 }

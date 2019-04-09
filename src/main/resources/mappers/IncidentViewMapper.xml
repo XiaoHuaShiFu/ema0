@@ -9,9 +9,12 @@
       <arg column="update_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
     </constructor>
   </resultMap>
+  <sql id="Base_Column_List" >
+    user_id, incident_id, create_time, update_time
+  </sql>
   <insert id="insert" parameterType="com.ema.pojo.IncidentView" >
-    insert into incident_view (user_id, incident_id, create_time)
-    values (#{userId,jdbcType=INTEGER}, #{incidentId,jdbcType=INTEGER}, now())
+    insert into incident_view (user_id, incident_id)
+    values (#{userId,jdbcType=INTEGER}, #{incidentId,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.ema.pojo.IncidentView" >
     insert into incident_view
@@ -34,4 +37,21 @@
       now()
     </trim>
   </insert>
+
+  <select id="selectCountByUserIdAndIncidentId" parameterType="map" resultType="int">
+    SELECT
+    COUNT(1)
+    FROM incident_view
+    WHERE user_id = #{userId}
+    AND incident_id = #{incidentId}
+  </select>
+
+  <select id="selectByUserId" parameterType="integer" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM incident_view
+    WHERE user_id = #{userId}
+    ORDER BY create_time
+  </select>
+
 </mapper>

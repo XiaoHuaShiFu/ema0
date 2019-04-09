@@ -1,7 +1,5 @@
 package com.ema.vo;
 
-import com.ema.pojo.Tag;
-
 import java.util.List;
 
 public class IncidentVo {
@@ -36,6 +34,8 @@ public class IncidentVo {
     private Float latitude;
 
     private Float longitude;
+
+    private List<IncidentCommentVo> incidentCommentVoList;
 
     public Integer getId() {
         return id;
@@ -163,5 +163,13 @@ public class IncidentVo {
 
     public void setLongitude(Float longitude) {
         this.longitude = longitude;
+    }
+
+    public List<IncidentCommentVo> getIncidentCommentVoList() {
+        return incidentCommentVoList;
+    }
+
+    public void setIncidentCommentVoList(List<IncidentCommentVo> incidentCommentVoList) {
+        this.incidentCommentVoList = incidentCommentVoList;
     }
 }

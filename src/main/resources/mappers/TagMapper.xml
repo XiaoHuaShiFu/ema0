@@ -78,4 +78,35 @@
             WHERE i_id = #{incidentId}
         )
     </select>
+
+    <insert id="insertTagIfNotExist" parameterType="com.ema.pojo.Tag" useGeneratedKeys="true" keyProperty="id">
+        INSERT
+        INTO tag
+        (name)
+        VALUES (#{name})
+    </insert>
+
+    <select id="selectCountByName" parameterType="string" resultType="int">
+        SELECT
+        COUNT(1)
+        FROM tag
+        WHERE name = #{name}
+    </select>
+
+    <select id="selectTagList"  resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM tag
+        ORDER BY num
+    </select>
+
+    <update id="incrNumByTagIds" parameterType="int">
+        UPDATE tag
+        SET num = num + 1
+        WHERE id IN
+        <foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
 </mapper>

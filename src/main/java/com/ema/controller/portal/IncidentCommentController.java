@@ -8,6 +8,7 @@ import com.ema.pojo.User;
 import com.ema.service.IIncidentCommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
@@ -46,18 +47,56 @@ public class IncidentCommentController {
 
     /**
      * 获得一个一级评论的详细信息
+     * 状态码0表示获取成功
+     * 状态码1表示获取失败
      *
      * @param session 会话
      * @param id 评论的id
      * @return 返回评论的详细信息
      */
     @RequestMapping(value = "get_comment.do")
-    public ServerResponse getComment(HttpSession session, int id) {
+    public ServerResponse getComment(HttpSession session, Integer id) {
         User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
         return iIncidentCommentService.getComment(id, sessionUser);
     }
 
-    // TODO: 2019/4/9 删除一个一级评论 
-    // TODO: 2019/4/9 获取一级评论的简略列表 
-    
+    /**
+     * 删除一个一级评论
+     * 状态码0表示删除成功
+     * 状态码1表示删除失败
+     * 状态码10表示未登录
+     *
+     * @param session 会话
+     * @param id 用户id
+     * @param incidentId 事件id
+     * @return 带状态码的响应
+     */
+    @RequestMapping(value = "delete.do")
+    public ServerResponse deleteComment(HttpSession session, Integer id, Integer incidentId) {
+        User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
+        if (sessionUser == null) {
+            return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+        }
+        return iIncidentCommentService.deleteComment(sessionUser, id, incidentId);
+    }
+
+
+    /**
+     * 状态码0表示获取成功
+     *
+     * @param incidentId 事件id
+     * @param pageNum 页码，默认1
+     * @param pageSize 页大小，默认10
+     * @return 带状态码的响应信息
+     */
+    @RequestMapping(value = "list.do")
+    public ServerResponse list(Integer incidentId,
+                               @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+                               @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
+        return iIncidentCommentService.getCommentList(incidentId, pageNum, pageSize);
+    }
+
+    @RequestMapping(value = "collect.do")
+    public ServerResponse collectComment
+
 }

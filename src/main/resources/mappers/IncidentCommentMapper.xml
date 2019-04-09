@@ -174,4 +174,19 @@
     WHERE id = #{incidentCommentId}
   </update>
 
+  <delete id="deleteByIdAndUserId" parameterType="map">
+    DELETE
+    FROM incident_comment
+    WHERE id = #{id}
+    AND user_id = #{userId}
+  </delete>
+
+  <select id="selectByIncidentId" parameterType="integer" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM incident_comment
+    WHERE incident_id = #{incidentId}
+    ORDER BY thumb_ups
+  </select>
+
 </mapper>

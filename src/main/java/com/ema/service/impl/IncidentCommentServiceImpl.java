@@ -2,6 +2,7 @@ package com.ema.service.impl;
 
 import com.ema.common.ServerResponse;
 import com.ema.dao.IncidentCommentMapper;
+import com.ema.dao.IncidentMapper;
 import com.ema.dao.UserMapper;
 import com.ema.pojo.IncidentComment;
 import com.ema.pojo.User;
@@ -10,8 +11,13 @@ import com.ema.service.IIncidentScndCommentService;
 import com.ema.util.DateTimeUtil;
 import com.ema.vo.IncidentCommentVo;
 import com.ema.vo.UserVo;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -23,6 +29,9 @@ import org.springframework.stereotype.Service;
  */
 @Service("iIncidentCommentService")
 public class IncidentCommentServiceImpl implements IIncidentCommentService{
+
+    @Autowired
+    private IncidentMapper incidentMapper;
 
     @Autowired
     private IncidentCommentMapper incidentCommentMapper;
@@ -55,7 +64,10 @@ public class IncidentCommentServiceImpl implements IIncidentCommentService{
         incidentComment.setUpdateTime(null);
         incidentComment.setCommentTime(null);
         incidentComment.setUserId(sessionUser.getId());
+        //插入评论
         incidentCommentMapper.insertSelective(incidentComment);
+        //事件的评论数+1
+        incidentMapper.incrComments(incidentComment.getIncidentId());
         return ServerResponse.createBySuccess("upload comment success", incidentComment.getId());
     }
 
@@ -77,6 +89,60 @@ public class IncidentCommentServiceImpl implements IIncidentCommentService{
         incidentCommentVo.setIncidentScndCommentVoList(
                 iIncidentScndCommentService.getIncidentScndCommentVoList(sessionUser, 1, 2, id));
         return ServerResponse.createBySuccess(incidentCommentVo);
+    }
+
+    /**
+     * 删除一个一级评论
+     *
+     * @param sessionUser 发出删除请求的用户pojo
+     * @param id 一级评论id
+     * @param incidentId
+     * @return 带状态码的响应
+     */
+    public ServerResponse deleteComment(User sessionUser, int id, Integer incidentId) {
+        int rowCount = incidentCommentMapper.deleteByIdAndUserId(sessionUser.getId(), id);
+        //删除评论失败
+        if (rowCount < 1) {
+            return ServerResponse.createByErrorMessage("delete comment false");
+        }
+        //事件的评论数-1
+        incidentMapper.decrComments(incidentId);
+        return ServerResponse.createBySuccess("delete comment success");
+    }
+
+    /**
+     * 获取一个事件的一级评论简略列表
+     *
+     * @param incidentId 事件id
+     * @param pageNum 页码
+     * @param pageSize 页大小
+     * @return 简略评论列表
+     */
+    public ServerResponse getCommentList(Integer incidentId, int pageNum, int pageSize) {
+        PageInfo<IncidentCommentVo> result = new PageInfo<>(getIncidentCommentVoList(incidentId, pageNum, pageSize));
+        return ServerResponse.createBySuccess(result);
+    }
+
+    /**
+     * 获取事件一级评论的简略信息列表
+     *
+     * @param incidentId
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    public List<IncidentCommentVo> getIncidentCommentVoList(Integer incidentId, int pageNum, int pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
+        List<IncidentComment> incidentCommentList = incidentCommentMapper.selectByIncidentId(incidentId);
+        List<IncidentCommentVo> incidentCommentVoList = new ArrayList<>();
+        if (incidentCommentList != null) {
+            for (IncidentComment i : incidentCommentList) {
+                User user = userMapper.selectByPrimaryKey(i.getUserId());
+                IncidentCommentVo incidentCommentVo = assembleIncidentCommentVo(i, user);
+                incidentCommentVoList.add(incidentCommentVo);
+            }
+        }
+        return incidentCommentVoList;
     }
 
     /**
@@ -108,6 +174,9 @@ public class IncidentCommentServiceImpl implements IIncidentCommentService{
      * @return
      */
     private UserVo assembleUserVo(User user) {
+        if (user == null) {
+            return null;
+        }
         UserVo userVo = new UserVo();
         userVo.setId(user.getId());
         userVo.setNickName(user.getNickName());

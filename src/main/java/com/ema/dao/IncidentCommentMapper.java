@@ -1,6 +1,9 @@
 package com.ema.dao;
 
 import com.ema.pojo.IncidentComment;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface IncidentCommentMapper {
     int deleteByPrimaryKey(Integer id);
@@ -19,4 +22,7 @@ public interface IncidentCommentMapper {
 
     int decrComments(Integer incidentCommentId);
 
+    int deleteByIdAndUserId(@Param("userId") Integer userId, @Param("id") int id);
+
+    List<IncidentComment> selectByIncidentId(Integer incidentId);
 }

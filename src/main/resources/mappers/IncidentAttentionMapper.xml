@@ -9,10 +9,6 @@
       <arg column="update_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
     </constructor>
   </resultMap>
-  <insert id="insert" parameterType="com.ema.pojo.IncidentAttention" >
-    insert into incident_attention (user_id, incident_id)
-    values (#{userId,jdbcType=INTEGER}, #{incidentId,jdbcType=INTEGER})
-  </insert>
   <insert id="insertSelective" parameterType="com.ema.pojo.IncidentAttention" >
     insert into incident_attention
     <trim prefix="(" suffix=")" suffixOverrides="," >
@@ -32,4 +28,19 @@
       </if>
     </trim>
   </insert>
+
+  <insert id="insert" parameterType="map" >
+    INSERT
+    INTO incident_attention
+    (user_id, incident_id)
+    VALUES (#{userId}, #{incidentId})
+  </insert>
+
+  <delete id="deleteByUserIdAndIncidentId" parameterType="map">
+    DELETE
+    FROM incident_attention
+    WHERE user_id = #{userId}
+    AND incident_id = #{incidentId}
+  </delete>
+
 </mapper>
