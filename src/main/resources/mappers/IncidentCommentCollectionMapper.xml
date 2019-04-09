@@ -4,14 +4,14 @@
   <resultMap id="BaseResultMap" type="com.ema.pojo.IncidentCommentCollection" >
     <constructor >
       <arg column="user_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
-      <arg column="incident_comment_Id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="incident_comment_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
       <arg column="create_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
       <arg column="update_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
     </constructor>
   </resultMap>
   <insert id="insert" parameterType="com.ema.pojo.IncidentCommentCollection" >
-    insert into incident_comment_collection (user_id, incident_comment_Id, create_time)
-    values (#{userId,jdbcType=INTEGER}, #{incidentCommentId,jdbcType=INTEGER}, now())
+    insert into incident_comment_collection (user_id, incident_comment_id)
+    values (#{userId,jdbcType=INTEGER}, #{incidentCommentId,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.ema.pojo.IncidentCommentCollection" >
     insert into incident_comment_collection
@@ -20,9 +20,8 @@
         user_id,
       </if>
       <if test="incidentCommentId != null" >
-        incident_comment_Id,
+        incident_comment_id,
       </if>
-      create_time
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="userId != null" >
@@ -31,7 +30,13 @@
       <if test="incidentCommentId != null" >
         #{incidentCommentId,jdbcType=INTEGER},
       </if>
-      now()
     </trim>
   </insert>
+
+  <delete id="deleteByUserIdAndCommentId" parameterType="map" >
+    DELETE
+    FROM incident_comment_collection
+    WHERE user_id = #{userId}
+    AND incident_comment_id = #{commentId}
+  </delete>
 </mapper>

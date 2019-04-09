@@ -24,4 +24,8 @@ public interface IIncidentCommentService {
     ServerResponse getCommentList(Integer incidentId, int pageNum, int pageSize);
 
     List<IncidentCommentVo> getIncidentCommentVoList(Integer incidentId, int pageNum, int pageSize);
+
+    ServerResponse collectComment(Integer userId, Integer commentId);
+
+    ServerResponse thumbUpComment(Integer userId, Integer id);
 }

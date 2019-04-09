@@ -25,4 +25,12 @@ public interface IncidentCommentMapper {
     int deleteByIdAndUserId(@Param("userId") Integer userId, @Param("id") int id);
 
     List<IncidentComment> selectByIncidentId(Integer incidentId);
+
+    int incrCollections(@Param("commentId") Integer commentId, @Param("userId") Integer userId);
+
+    int decrCollections(@Param("commentId") Integer commentId, @Param("userId") Integer userId);
+
+    int incrThumbUps(@Param("id") Integer id, @Param("userId") Integer userId);
+
+    int decrThumbUps(@Param("id") Integer id, @Param("userId") Integer userId);
 }

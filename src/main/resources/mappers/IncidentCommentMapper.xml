@@ -189,4 +189,60 @@
     ORDER BY thumb_ups
   </select>
 
+  <update id="incrCollections" parameterType="map" >
+    UPDATE
+    incident_comment
+    SET collections = collections + 1
+    WHERE id = #{commentId}
+    AND NOT EXISTS (
+      SELECT
+      id
+      FROM incident_comment_collection
+      WHERE user_id = #{userId}
+      AND incident_comment_id = #{commentId}
+    )
+  </update>
+
+  <update id="decrCollections" parameterType="map" >
+    UPDATE
+    incident_comment
+    SET collections = collections - 1
+    WHERE id = #{commentId}
+    AND EXISTS (
+    SELECT
+    id
+    FROM incident_comment_collection
+    WHERE user_id = #{userId}
+    AND incident_comment_id = #{commentId}
+    )
+  </update>
+
+  <update id="incrThumbUps" parameterType="map">
+    UPDATE
+    incident_comment
+    SET thumb_ups = thumb_ups + 1
+    WHERE id = #{id}
+    AND NOT EXISTS (
+    SELECT
+    id
+    FROM ic_thumb_up
+    WHERE u_id = #{userId}
+    AND ic_id = #{id}
+    )
+  </update>
+
+  <update id="decrThumbUps" parameterType="map">
+    UPDATE
+    incident_comment
+    SET thumb_ups = thumb_ups - 1
+    WHERE id = #{id}
+    AND EXISTS (
+    SELECT
+    id
+    FROM ic_thumb_up
+    WHERE u_id = #{userId}
+    AND ic_id = #{id}
+    )
+  </update>
+
 </mapper>

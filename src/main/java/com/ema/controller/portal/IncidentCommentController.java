@@ -96,7 +96,50 @@ public class IncidentCommentController {
         return iIncidentCommentService.getCommentList(incidentId, pageNum, pageSize);
     }
 
+    /**
+     * 收藏一个事件
+     * 如果返回状态码1表明收藏失败
+     * 如果返回状态码10表明用户未登录
+     * 如果返回状态码284表明收藏成功
+     * 如果返回状态码285表明取消收藏成功
+     *
+     * 此接口如果已经收藏则取消收藏，未收藏则增加收藏
+     *
+     * @param session 会话
+     * @param id 事件评论id
+     * @return 带状态码的响应
+     */
     @RequestMapping(value = "collect.do")
-    public ServerResponse collectComment
+    public ServerResponse collectComment(HttpSession session, Integer id) {
+        User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
+        if (sessionUser == null) {
+            return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+        }
+        return iIncidentCommentService.collectComment(sessionUser.getId(),id);
+    }
 
+    /**
+     * 点赞
+     * 如果返回状态码1表明点赞失败
+     * 如果返回状态码10表明用户未登录
+     * 如果返回状态码280表明点赞成功
+     * 如果返回状态码281表明取消赞成功
+     *
+     * 此接口如果已经点赞则取消点赞，未点赞则增加点赞
+     *
+     * @param id 一级评论id
+     * @param session 会话
+     * @return 带状态码的响应
+     */
+    @RequestMapping(value = "thumb_up.do")
+    public ServerResponse thumbUpComment(HttpSession session, Integer id) {
+        User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
+        if (sessionUser == null) {
+            return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+        }
+        return iIncidentCommentService.thumbUpComment(sessionUser.getId(),id);
+    }
+
+    // TODO: 2019/4/10 用户自己的一级评论的事件列表
+    // TODO: 2019/4/10 用户收藏的一级评论列表
 }

@@ -1,10 +1,11 @@
 package com.ema.service.impl;
 
+import com.ema.common.ResponseCode;
 import com.ema.common.ServerResponse;
-import com.ema.dao.IncidentCommentMapper;
-import com.ema.dao.IncidentMapper;
-import com.ema.dao.UserMapper;
+import com.ema.dao.*;
+import com.ema.pojo.ICThumbUp;
 import com.ema.pojo.IncidentComment;
+import com.ema.pojo.IncidentCommentCollection;
 import com.ema.pojo.User;
 import com.ema.service.IIncidentCommentService;
 import com.ema.service.IIncidentScndCommentService;
@@ -37,10 +38,17 @@ public class IncidentCommentServiceImpl implements IIncidentCommentService{
     private IncidentCommentMapper incidentCommentMapper;
 
     @Autowired
+    private IncidentCommentCollectionMapper incidentCommentCollectionMapper;
+
+    @Autowired
     private UserMapper userMapper;
 
     @Autowired
+    private ICThumbUpMapper icThumbUpMapper;
+
+    @Autowired
     private IIncidentScndCommentService iIncidentScndCommentService;
+
 
     /**
      * 保存一个事件的评论
@@ -143,6 +151,80 @@ public class IncidentCommentServiceImpl implements IIncidentCommentService{
             }
         }
         return incidentCommentVoList;
+    }
+
+    /**
+     * 收藏
+     * 如果返回状态码1表明点赞失败
+     * 如果返回状态码284表明点赞成功
+     * 如果返回状态码285表明取消赞成功
+     *
+     * @param commentId 一级评论id
+     * @param userId 用户id
+     * @return 带状态码的响应
+     */
+    public ServerResponse collectComment(Integer userId, Integer commentId) {
+        //尝试让收藏数+1，如果此用户没有收藏过此一级评论的话
+        int rowCount = incidentCommentMapper.incrCollections(commentId, userId);
+        //如果收藏成功则把收藏的映射对加入数据库
+        if (rowCount >= 1) {
+            IncidentCommentCollection icc = new IncidentCommentCollection();
+            icc.setUserId(userId);
+            icc.setIncidentCommentId(commentId);
+            incidentCommentCollectionMapper.insertSelective(icc);
+            return ServerResponse.create(
+                    ResponseCode.COLLECTION_SUCCESS.getCode(), ResponseCode.COLLECTION_SUCCESS.getDesc());
+        }
+
+        //如果收藏失败则表明此次是取消收藏
+        if (rowCount < 1) {
+            //把一级评论的收藏数-1
+            incidentCommentMapper.decrCollections(commentId, userId);
+            //并删除收藏映射对
+            incidentCommentCollectionMapper.deleteByUserIdAndCommentId(commentId, userId);
+            return ServerResponse.create(
+                    ResponseCode.CANCEL_COLLECTION_SUCCESS.getCode(), ResponseCode.CANCEL_COLLECTION_SUCCESS.getDesc());
+        }
+
+        //收藏失败
+        return ServerResponse.createByErrorMessage("collection false");
+    }
+
+    /**
+     * 点赞
+     * 如果返回状态码1表明点赞失败
+     * 如果返回状态码280表明点赞成功
+     * 如果返回状态码281表明取消赞成功
+     *
+     * @param id 二级评论id
+     * @param userId 用户id
+     * @return 带状态码的响应
+     */
+    public ServerResponse thumbUpComment(Integer userId, Integer id) {
+        //尝试让点赞数+1，如果此用户没有点赞过此一级评论的话
+        int rowCount = incidentCommentMapper.incrThumbUps(id, userId);
+        //如果点赞成功则把点赞的映射对加入数据库
+        if (rowCount >= 1) {
+            ICThumbUp icThumbUp = new ICThumbUp();
+            icThumbUp.setuId(userId);
+            icThumbUp.setIcId(id);
+            icThumbUpMapper.insert(icThumbUp);
+            return ServerResponse.create(
+                    ResponseCode.THUMB_UP_SUCCESS.getCode(), ResponseCode.THUMB_UP_SUCCESS.getDesc());
+        }
+
+        //如果点赞失败则表明此次是取消点赞
+        if (rowCount < 1) {
+            //把一级评论的点赞数-1
+            incidentCommentMapper.decrThumbUps(id, userId);
+            //并删除点赞映射对
+            icThumbUpMapper.deleteByUserIdAndICId(id, userId);
+            return ServerResponse.create(
+                    ResponseCode.CANCEL_THUMB_UP_SUCCESS.getCode(), ResponseCode.CANCEL_THUMB_UP_SUCCESS.getDesc());
+        }
+
+        //点赞失败
+        return ServerResponse.createByErrorMessage("thumb up false");
     }
 
     /**

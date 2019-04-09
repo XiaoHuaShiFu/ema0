@@ -219,4 +219,8 @@ public class IncidentController {
         return iIncidentService.getViewList(sessionUser.getId(), pageNum, pageSize);
     }
 
+    // TODO: 2019/4/10 关注列表 
+    // TODO: 2019/4/10 用户自己发布的事件列表 
+
+    
 }
