@@ -32,4 +32,8 @@ public interface IIncidentService {
     ServerResponse viewIncident(Integer userId, Integer incidentId);
 
     ServerResponse getViewList(Integer userId, int pageNum, int pageSize);
+
+    ServerResponse getAttentionList(Integer userId, int pageNum, int pageSize);
+
+    ServerResponse getReportList(Integer userId, int pageNum, int pageSize);
 }

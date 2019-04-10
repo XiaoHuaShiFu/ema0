@@ -263,6 +263,8 @@ public class IncidentServiceImpl implements IIncidentService{
         //如果关注成功则把关注的映射对加入数据库
         if (rowCount >= 1) {
             incidentAttentionMapper.insert(userId, id);
+            //用户关注数+1
+            userMapper.incrAttentions(userId);
             return ServerResponse.create(
                     ResponseCode.ATTENTION_SUCCESS.getCode(), ResponseCode.ATTENTION_SUCCESS.getDesc());
         }
@@ -273,6 +275,8 @@ public class IncidentServiceImpl implements IIncidentService{
             incidentMapper.decrAttentions(id, userId);
             //并删除关注映射对
             incidentAttentionMapper.deleteByUserIdAndIncidentId(id, userId);
+            //用户关注数-1
+            userMapper.decrAttentions(userId);
             return ServerResponse.create(
                     ResponseCode.CANCEL_ATTENTION_SUCCESS.getCode(), ResponseCode.CANCEL_ATTENTION_SUCCESS.getDesc());
         }
@@ -307,6 +311,8 @@ public class IncidentServiceImpl implements IIncidentService{
         incidentView.setUserId(userId);
         incidentView.setIncidentId(incidentId);
         incidentViewMapper.insert(incidentView);
+        //把用户浏览数+1
+        userMapper.incrViews(userId);
         return ServerResponse.createBySuccess("view success");
     }
 
@@ -321,6 +327,110 @@ public class IncidentServiceImpl implements IIncidentService{
     public ServerResponse getViewList(Integer userId, int pageNum, int pageSize) {
         PageInfo<IncidentViewVo> result = new PageInfo<>(getIncidentViewVoList(userId, pageNum, pageSize));
         return ServerResponse.createBySuccess(result);
+    }
+
+    /**
+     * 获取用户关注的事件列表
+     *
+     * @param userId 发出请求的用户id
+     * @param pageNum 页码
+     * @param pageSize 页条数
+     * @return 用户关注的事件列表
+     */
+    public ServerResponse getAttentionList(Integer userId, int pageNum, int pageSize) {
+        PageInfo<UserAttentionIncidentVo> result = new PageInfo<>(
+                getUserAttentionIncidentVoList(userId, pageNum, pageSize));
+        return ServerResponse.createBySuccess(result);
+    }
+
+    /**
+     * 获取用户发布的事件列表
+     *
+     * @param userId 发出请求的用户id
+     * @param pageNum 页码
+     * @param pageSize 页条数
+     * @return 用户用户发布的事件列表
+     */
+    public ServerResponse getReportList(Integer userId, int pageNum, int pageSize) {
+        PageInfo<UserReportIncidentVo> result = new PageInfo<>(
+                getUserReportIncidentVoList(userId, pageNum, pageSize));
+        return ServerResponse.createBySuccess(result);
+    }
+
+    /**
+     * 获取UserReportIncidentVoList
+     *
+     * @param userId 发出请求的用户id
+     * @param pageNum 页码
+     * @param pageSize 页条数
+     * @return UserReportIncidentVoList
+     */
+    private List<UserReportIncidentVo> getUserReportIncidentVoList(Integer userId, int pageNum, int pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
+        List<Incident> incidentList = incidentMapper.selectByUserId0(userId);
+        if (incidentList == null) {
+            return null;
+        }
+        List<UserReportIncidentVo> userReportIncidentVoList = new ArrayList<>();
+        for (Incident i : incidentList) {
+            UserReportIncidentVo userReportIncidentVo = assembleUserReportIncidentVo(i);
+            userReportIncidentVoList.add(userReportIncidentVo);
+        }
+        return userReportIncidentVoList;
+    }
+
+    /**
+     * 装配UserReportIncidentVo
+     *
+     * @param incident
+     * @return
+     */
+    private UserReportIncidentVo assembleUserReportIncidentVo(Incident incident) {
+        UserReportIncidentVo userReportIncidentVo = new UserReportIncidentVo();
+        userReportIncidentVo.setId(incident.getId());
+        userReportIncidentVo.setViews(incident.getViews());
+        userReportIncidentVo.setAttentions(incident.getAttentions());
+        userReportIncidentVo.setComments(incident.getComments());
+        userReportIncidentVo.setTitle(incident.getTitle());
+        return userReportIncidentVo;
+    }
+
+    /**
+     * 获取UserAttentionIncidentVoList
+     *
+     * @param userId 发出请求的用户id
+     * @param pageNum 页码
+     * @param pageSize 页条数
+     * @return UserAttentionIncidentVoList
+     */
+    private List<UserAttentionIncidentVo> getUserAttentionIncidentVoList(Integer userId, int pageNum, int pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
+        List<Incident> incidentList = incidentMapper.selectByUserId(userId);
+        if (incidentList == null) {
+            return null;
+        }
+        List<UserAttentionIncidentVo> userAttentionIncidentVoList = new ArrayList<>();
+        for (Incident i : incidentList) {
+            UserAttentionIncidentVo userAttentionIncidentVo = assembleUserAttentionIncidentVo(i);
+            userAttentionIncidentVoList.add(userAttentionIncidentVo);
+        }
+        return userAttentionIncidentVoList;
+    }
+
+    /**
+     * 装配UserAttentionIncidentVo
+     *
+     * @param incident
+     * @return
+     */
+    private UserAttentionIncidentVo assembleUserAttentionIncidentVo(Incident incident) {
+        UserAttentionIncidentVo userAttentionIncidentVo = new UserAttentionIncidentVo();
+        userAttentionIncidentVo.setId(incident.getId());
+        userAttentionIncidentVo.setViews(incident.getViews());
+        userAttentionIncidentVo.setAttentions(incident.getAttentions());
+        userAttentionIncidentVo.setComments(incident.getComments());
+        userAttentionIncidentVo.setTitle(incident.getTitle());
+        return userAttentionIncidentVo;
     }
 
     /**

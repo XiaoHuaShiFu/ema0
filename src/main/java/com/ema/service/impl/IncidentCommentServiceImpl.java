@@ -11,6 +11,8 @@ import com.ema.service.IIncidentCommentService;
 import com.ema.service.IIncidentScndCommentService;
 import com.ema.util.DateTimeUtil;
 import com.ema.vo.IncidentCommentVo;
+import com.ema.vo.UserCollectionIncidentCommentVo;
+import com.ema.vo.UserIncidentCommentVo;
 import com.ema.vo.UserVo;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -76,6 +78,8 @@ public class IncidentCommentServiceImpl implements IIncidentCommentService{
         incidentCommentMapper.insertSelective(incidentComment);
         //事件的评论数+1
         incidentMapper.incrComments(incidentComment.getIncidentId());
+        //用户评论数+1
+        userMapper.incrComments(sessionUser.getId());
         return ServerResponse.createBySuccess("upload comment success", incidentComment.getId());
     }
 
@@ -115,6 +119,8 @@ public class IncidentCommentServiceImpl implements IIncidentCommentService{
         }
         //事件的评论数-1
         incidentMapper.decrComments(incidentId);
+        //用户评论数-1
+        userMapper.decrComments(sessionUser.getId());
         return ServerResponse.createBySuccess("delete comment success");
     }
 
@@ -172,6 +178,8 @@ public class IncidentCommentServiceImpl implements IIncidentCommentService{
             icc.setUserId(userId);
             icc.setIncidentCommentId(commentId);
             incidentCommentCollectionMapper.insertSelective(icc);
+            //用户收藏数+1
+            userMapper.incrCollections(userId);
             return ServerResponse.create(
                     ResponseCode.COLLECTION_SUCCESS.getCode(), ResponseCode.COLLECTION_SUCCESS.getDesc());
         }
@@ -182,6 +190,8 @@ public class IncidentCommentServiceImpl implements IIncidentCommentService{
             incidentCommentMapper.decrCollections(commentId, userId);
             //并删除收藏映射对
             incidentCommentCollectionMapper.deleteByUserIdAndCommentId(commentId, userId);
+            //用户收藏数-1
+            userMapper.decrCollections(userId);
             return ServerResponse.create(
                     ResponseCode.CANCEL_COLLECTION_SUCCESS.getCode(), ResponseCode.CANCEL_COLLECTION_SUCCESS.getDesc());
         }
@@ -225,6 +235,123 @@ public class IncidentCommentServiceImpl implements IIncidentCommentService{
 
         //点赞失败
         return ServerResponse.createByErrorMessage("thumb up false");
+    }
+
+    /**
+     * 获取用户最近评论列表
+     *
+     * @param userId 用户id
+     * @param pageNum 页码
+     * @param pageSize 页条数
+     * @return 用户最近评论列表
+     */
+    public ServerResponse getUserCommentList(Integer userId, int pageNum, int pageSize) {
+        PageInfo<UserIncidentCommentVo> result = new PageInfo<>(getUserIncidentCommentVoList(userId, pageNum, pageSize));
+        return ServerResponse.createBySuccess(result);
+    }
+
+
+    /**
+     * 获取用户收藏列表
+     *
+     * @param userId 用户id
+     * @param pageNum 页码
+     * @param pageSize 页条数
+     * @return 用户收藏列表
+     */
+    public ServerResponse getCollectionList(Integer userId, int pageNum, int pageSize) {
+        PageInfo<UserCollectionIncidentCommentVo> result = new PageInfo<>(getUserCollectionIncidentCommentVoList(userId, pageNum, pageSize));
+        return ServerResponse.createBySuccess(result);
+    }
+
+
+    /**
+     * 获取用户最近评论列表
+     *
+     * @param userId 用户id
+     * @param pageNum 页码
+     * @param pageSize 页条数
+     * @return 用户最近评论列表
+     */
+    private List<UserIncidentCommentVo> getUserIncidentCommentVoList(Integer userId, int pageNum, int pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
+        List<IncidentComment> incidentCommentList = incidentCommentMapper.selectByUserId(userId);
+        List<UserIncidentCommentVo> userIncidentCommentVoList = new ArrayList<>();
+        if (incidentCommentList != null) {
+            for (IncidentComment i : incidentCommentList) {
+                String incidentTitle = incidentMapper.selectTitleById(i.getIncidentId());
+                UserIncidentCommentVo userIncidentCommentVo = assembleUserIncidentCommentVo(i, incidentTitle);
+                userIncidentCommentVoList.add(userIncidentCommentVo);
+            }
+        }
+        return userIncidentCommentVoList;
+    }
+
+
+
+    /**
+     * 获取用户收藏评论列表
+     *
+     * @param userId 用户id
+     * @param pageNum 页码
+     * @param pageSize 页条数
+     * @return 用户收藏评论列表
+     */
+    private List<UserCollectionIncidentCommentVo> getUserCollectionIncidentCommentVoList(Integer userId, int pageNum, int pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
+        List<IncidentComment> incidentCommentList = incidentCommentMapper.selectByUserId0(userId);
+        List<UserCollectionIncidentCommentVo> userCollectionIncidentCommentVoList = new ArrayList<>();
+        if (incidentCommentList != null) {
+            for (IncidentComment i : incidentCommentList) {
+                String incidentTitle = incidentMapper.selectTitleById(i.getIncidentId());
+                User user = userMapper.selectByPrimaryKey(i.getUserId());
+                UserCollectionIncidentCommentVo userCollectionIncidentCommentVo =
+                        assembleUserCollectionIncidentCommentVo(i, incidentTitle, user);
+                userCollectionIncidentCommentVoList.add(userCollectionIncidentCommentVo);
+            }
+        }
+        return userCollectionIncidentCommentVoList;
+    }
+
+    /**
+     * 装配UserCollectionIncidentCommentVo
+     *
+     * @param incidentComment
+     * @param incidentTitle
+     * @param user
+     * @return
+     */
+    private UserCollectionIncidentCommentVo assembleUserCollectionIncidentCommentVo(
+            IncidentComment incidentComment, String incidentTitle, User user) {
+        UserCollectionIncidentCommentVo userCollectionIncidentCommentVo = new UserCollectionIncidentCommentVo();
+        userCollectionIncidentCommentVo.setUserVo(assembleUserVo(user));
+        userCollectionIncidentCommentVo.setCommentId(incidentComment.getId());
+        userCollectionIncidentCommentVo.setIncidentTitle(incidentTitle);
+        userCollectionIncidentCommentVo.setComment(incidentComment.getComment());
+        userCollectionIncidentCommentVo.setComments(incidentComment.getComments());
+        userCollectionIncidentCommentVo.setCollections(incidentComment.getCollections());
+        userCollectionIncidentCommentVo.setThumbUps(incidentComment.getThumbUps());
+        userCollectionIncidentCommentVo.setCommentTime(DateTimeUtil.dateToStr(incidentComment.getCommentTime()));
+        return userCollectionIncidentCommentVo;
+    }
+
+    /**
+     * 装配UserIncidentCommentVo
+     *
+     * @param incidentComment
+     * @param incidentTitle
+     * @return
+     */
+    private UserIncidentCommentVo assembleUserIncidentCommentVo(IncidentComment incidentComment, String incidentTitle) {
+        UserIncidentCommentVo userIncidentCommentVo = new UserIncidentCommentVo();
+        userIncidentCommentVo.setCommentId(incidentComment.getId());
+        userIncidentCommentVo.setIncidentTitle(incidentTitle);
+        userIncidentCommentVo.setComment(incidentComment.getComment());
+        userIncidentCommentVo.setComments(incidentComment.getComments());
+        userIncidentCommentVo.setCollections(incidentComment.getCollections());
+        userIncidentCommentVo.setThumbUps(incidentComment.getThumbUps());
+        userIncidentCommentVo.setCommentTime(DateTimeUtil.dateToStr(incidentComment.getCommentTime()));
+        return userIncidentCommentVo;
     }
 
     /**

@@ -140,6 +140,46 @@ public class IncidentCommentController {
         return iIncidentCommentService.thumbUpComment(sessionUser.getId(),id);
     }
 
-    // TODO: 2019/4/10 用户自己的一级评论的事件列表
-    // TODO: 2019/4/10 用户收藏的一级评论列表
+    /**
+     * 获取用户最近评论列表
+     * 如果返回状态码0表明获取失败
+     * 如果返回状态码10表明用户未登录
+     *
+     * @param session 会话
+     * @param pageNum 页码
+     * @param pageSize 页条数
+     * @return 用户最近评论列表
+     */
+    @RequestMapping(value = "user_list.do")
+    public ServerResponse getUserCommentList(HttpSession session,
+                                             @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+                                             @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
+        User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
+        if (sessionUser == null) {
+            return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+        }
+        return iIncidentCommentService.getUserCommentList(sessionUser.getId(), pageNum, pageSize);
+    }
+
+    /**
+     * 获取用户收藏列表
+     * 如果返回状态码0表明获取失败
+     * 如果返回状态码10表明用户未登录
+     *
+     * @param session 会话
+     * @param pageNum 页码
+     * @param pageSize 页条数
+     * @return 用户收藏列表
+     */
+    @RequestMapping(value = "collection_list.do")
+    public ServerResponse getCollectionList(HttpSession session,
+                                             @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+                                             @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
+        User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
+        if (sessionUser == null) {
+            return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+        }
+        return iIncidentCommentService.getCollectionList(sessionUser.getId(), pageNum, pageSize);
+    }
+
 }

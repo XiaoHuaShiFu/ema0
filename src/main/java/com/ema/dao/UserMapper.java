@@ -34,4 +34,18 @@ public interface UserMapper {
     int selectCountById(Integer id);
 
     User selectByParScndCommentId(Integer parScndCommentId);
+
+    int incrViews(Integer userId);
+
+    int incrAttentions(Integer userId);
+
+    int decrAttentions(Integer userId);
+
+    int incrComments(Integer userId);
+
+    int decrComments(Integer userId);
+
+    int incrCollections(Integer userId);
+
+    int decrCollections(Integer userId);
 }

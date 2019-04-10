@@ -245,4 +245,24 @@
     )
   </update>
 
+  <select id="selectByUserId" parameterType="integer" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM incident_comment
+    WHERE user_id = #{userId}
+    ORDER BY comment_time
+  </select>
+
+  <select id="selectByUserId0" parameterType="integer" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM incident_comment
+    WHERE id IN (
+    SELECT
+    incident_comment_id
+    FROM incident_comment_collection
+    WHERE user_id = #{userId}
+    ORDER BY create_time
+    )
+  </select>
 </mapper>

@@ -262,4 +262,31 @@
     WHERE id = #{incidentId}
   </update>
 
+  <select id="selectTitleById" parameterType="integer" resultType="string">
+    SELECT
+    title
+    FROM incident
+    WHERE id = #{incidentId}
+  </select>
+
+  <select id="selectByUserId" parameterType="integer" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM incident
+    WHERE id IN (
+    SELECT
+    incident_id
+    FROM incident_attention
+    WHERE user_id = #{userId}
+    ORDER BY create_time
+    )
+  </select>
+
+  <select id="selectByUserId0" parameterType="integer" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM incident
+    WHERE user_id = #{userId}
+  </select>
+
 </mapper>

@@ -103,7 +103,4 @@ public class IncidentScndCommentController {
         }
         return iIncidentScndCommentService.thumbUpComment(sessionUser.getId(),id);
     }
-
-    // TODO: 2019/4/10 用户自己的二级评论列表 
-
 }

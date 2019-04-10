@@ -28,4 +28,8 @@ public interface IIncidentCommentService {
     ServerResponse collectComment(Integer userId, Integer commentId);
 
     ServerResponse thumbUpComment(Integer userId, Integer id);
+
+    ServerResponse getUserCommentList(Integer userId, int pageNum, int pageSize);
+
+    ServerResponse getCollectionList(Integer userId, int pageNum, int pageSize);
 }

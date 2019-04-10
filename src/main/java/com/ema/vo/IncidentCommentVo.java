@@ -112,4 +112,5 @@ public class IncidentCommentVo {
     public void setIncidentScndCommentVoList(List<IncidentScndCommentVo> incidentScndCommentVoList) {
         this.incidentScndCommentVoList = incidentScndCommentVoList;
     }
+
 }

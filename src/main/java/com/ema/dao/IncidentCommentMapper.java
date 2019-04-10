@@ -33,4 +33,8 @@ public interface IncidentCommentMapper {
     int incrThumbUps(@Param("id") Integer id, @Param("userId") Integer userId);
 
     int decrThumbUps(@Param("id") Integer id, @Param("userId") Integer userId);
+
+    List<IncidentComment> selectByUserId(Integer userId);
+
+    List<IncidentComment> selectByUserId0(Integer userId);
 }

@@ -219,8 +219,46 @@ public class IncidentController {
         return iIncidentService.getViewList(sessionUser.getId(), pageNum, pageSize);
     }
 
-    // TODO: 2019/4/10 关注列表 
-    // TODO: 2019/4/10 用户自己发布的事件列表 
+    /**
+     * 获取用户关注的事件列表
+     * 如果返回状态码0表明获取成功
+     * 如果返回状态码10表明用户未登录
+     *
+     * @param session 会话
+     * @param pageNum 页码
+     * @param pageSize 页条数
+     * @return 用户关注的事件列表
+     */
+    @RequestMapping(value = "attention_list.do")
+    public ServerResponse getAttentionList(HttpSession session,
+                                      @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+                                      @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
+        User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
+        if (sessionUser == null) {
+            return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+        }
+        return iIncidentService.getAttentionList(sessionUser.getId(), pageNum, pageSize);
+    }
 
-    // TODO: 2019/4/10 用户的attentions comments collections views字段的更新未做 
+    /**
+     * 获取用户发布的事件列表
+     * 如果返回状态码0表明获取成功
+     * 如果返回状态码10表明用户未登录
+     *
+     * @param session 会话
+     * @param pageNum 页码
+     * @param pageSize 页条数
+     * @return 用户发布的事件列表
+     */
+    @RequestMapping(value = "report_list.do")
+    public ServerResponse getReportList(HttpSession session,
+                                           @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+                                           @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
+        User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
+        if (sessionUser == null) {
+            return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+        }
+        return iIncidentService.getReportList(sessionUser.getId(), pageNum, pageSize);
+    }
+
 }

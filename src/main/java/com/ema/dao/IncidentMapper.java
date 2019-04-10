@@ -33,4 +33,10 @@ public interface IncidentMapper {
     int decrAttentions(@Param("id") Integer id, @Param("userId") Integer userId);
 
     int incrViewsByIncidentId(Integer incidentId);
+
+    String selectTitleById(Integer incidentId);
+
+    List<Incident> selectByUserId(Integer userId);
+
+    List<Incident> selectByUserId0(Integer userId);
 }

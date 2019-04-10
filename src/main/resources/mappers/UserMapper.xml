@@ -228,28 +228,28 @@
 
   <update id="updateByIdIncrFollowers" parameterType="integer" >
     UPDATE
-    FROM user
+    user
     SET followers = followers + 1
     WHERE id = #{id}
   </update>
 
   <update id="updateByIdIncrFollowings" parameterType="integer" >
     UPDATE
-    FROM user
+    user
     SET followings = followings + 1
     WHERE id = #{id}
   </update>
 
   <update id="updateByIdDecrFollowers" parameterType="integer" >
     UPDATE
-    FROM user
+    user
     SET followers = followers - 1
     WHERE id = #{id}
   </update>
 
   <update id="updateByIdDecrFollowings" parameterType="integer" >
     UPDATE
-    FROM user
+    user
     SET followings = followings - 1
     WHERE id = #{id}
   </update>
@@ -273,5 +273,54 @@
       LIMIT 1
     )
   </select>
+
+  <update id="incrViews" parameterType="integer" >
+    UPDATE
+    user
+    SET views = views + 1
+    WHERE id = #{userId}
+  </update>
+
+  <update id="incrAttentions" parameterType="integer">
+    UPDATE
+    user
+    SET attentions = attentions + 1
+    WHERE id = #{userId}
+  </update>
+
+  <update id="decrAttentions" parameterType="integer">
+    UPDATE
+    user
+    SET attentions = attentions - 1
+    WHERE id = #{userId}
+  </update>
+
+  <update id="incrComments" parameterType="integer">
+    UPDATE
+    user
+    SET comments = comments + 1
+    WHERE id = #{userId}
+  </update>
+
+  <update id="decrComments" parameterType="integer">
+    UPDATE
+    user
+    SET comments = comments - 1
+    WHERE id = #{userId}
+  </update>
+
+  <update id="incrCollections" parameterType="integer">
+    UPDATE
+    user
+    SET collections = collections + 1
+    WHERE id = #{userId}
+  </update>
+
+  <update id="decrCollections" parameterType="integer">
+    UPDATE
+    user
+    SET collections = collections - 1
+    WHERE id = #{userId}
+  </update>
 
 </mapper>
