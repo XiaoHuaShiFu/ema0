@@ -12,6 +12,8 @@ import com.ema.pojo.WechatBody;
 import com.ema.service.IFileService;
 import com.ema.service.IUserService;
 import com.ema.util.PropertiesUtil;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.google.gson.Gson;
 import com.sun.org.apache.xml.internal.security.Init;
 import org.apache.commons.lang3.StringUtils;
@@ -365,51 +367,131 @@ public class UserServiceImpl implements IUserService {
         }
     }
 
-    //新消息通知
-    public ServerResponse Inform(User user){
+
+    /**
+     * 获取用户新通知的事件列表
+     *
+     * @param user 发出请求的用户
+     * @param pageNum 页码
+     * @param pageSize 页条数
+     * @return 用户关注的事件列表
+     */
+
+    public ServerResponse NewInform(User user, int pageNum, int pageSize){
         //发出此动作的一定是登陆的用户
         //否则越权操作
         if (user.getId() == null) {
             return ServerResponse.create(
                     ResponseCode.UNAUTHORIZED_OPERATION.getCode(), ResponseCode.UNAUTHORIZED_OPERATION.getDesc());
         }
+        PageInfo<String> Newmasg = new PageInfo<>(
+                getNewInform(user, pageNum, pageSize));
+        return ServerResponse.createBySuccess(Newmasg);
+    }
+
+    private List<String> getNewInform(User user, int pageNum, int pageSize){
+        PageHelper.startPage(pageNum, pageSize);
         UserNotice userNotice = new UserNotice();
         userNotice.setUserId(user.getId());
         userNotice.setView(0);
         //用user的id去user_notice表中找到对应被通知用户的id，如果有，且消息没看，则返回消息内容
         if (userNoticeMapper.selectCountByViewAndUserId(userNotice) != null &&userNoticeMapper.selectCountByViewAndUserId(userNotice).size() != 0) {
-                List<String> masg = userNoticeMapper.selectCountByViewAndUserId(userNotice);
+                List<String> NewmasgList = userNoticeMapper.selectCountByViewAndUserId(userNotice);
                 userNotice.setView(1);
                 //用户查看了消息，将View字段更新为1
-                for (int i = 0; i < masg.size(); i++) {
-                    String massage = masg.get(i);
+                for (int i = 0; i < NewmasgList.size(); i++) {
+                    String massage = NewmasgList.get(i);
                     userNotice.setContent(massage);
                     userNoticeMapper.updateByUser_id(userNotice);
                 }
-                return ServerResponse.createBySuccess(masg);
+                return NewmasgList;
         }
         else {
-            return ServerResponse.createBySuccess("no message");
+            return null;
         }
     }
 
-    //所有消息通知
-    public ServerResponse AllInform(User user){
+    /**
+     * 获取用户所有通知的事件列表
+     *
+     * @param user 发出请求的用户
+     * @param pageNum 页码
+     * @param pageSize 页条数
+     * @return 用户关注的事件列表
+     */
+    public ServerResponse AllInform(User user, int pageNum, int pageSize){
         //发出此动作的一定是登陆的用户
         //否则越权操作
         if (user.getId() == null) {
             return ServerResponse.create(
                     ResponseCode.UNAUTHORIZED_OPERATION.getCode(), ResponseCode.UNAUTHORIZED_OPERATION.getDesc());
         }
+        PageInfo<String> Allmasg = new PageInfo<>(
+                getAllInform(user, pageNum, pageSize));
+        return ServerResponse.createBySuccess(Allmasg);
+    }
+    private List<String> getAllInform(User user, int pageNum, int pageSize){
+        PageHelper.startPage(pageNum, pageSize);
         UserNotice userNotice = new UserNotice();
         userNotice.setUserId(user.getId());
         //将有关此用户的消息全都显示出来
         if (userNoticeMapper.selectCountByUserId(userNotice) != null && userNoticeMapper.selectCountByUserId(userNotice).size() != 0){
             List<String> Allmasg = userNoticeMapper.selectCountByUserId(userNotice);
-            return  ServerResponse.createBySuccess(Allmasg);
+            return Allmasg;
         }
         else
-            return ServerResponse.createBySuccess("no Message");
+            return null;
     }
-}
+    }
+
+
+
+
+//    //新消息通知
+//    public ServerResponse Inform(User user){
+//        //发出此动作的一定是登陆的用户
+//        //否则越权操作
+//        if (user.getId() == null) {
+//            return ServerResponse.create(
+//                    ResponseCode.UNAUTHORIZED_OPERATION.getCode(), ResponseCode.UNAUTHORIZED_OPERATION.getDesc());
+//        }
+//        UserNotice userNotice = new UserNotice();
+//        userNotice.setUserId(user.getId());
+//        userNotice.setView(0);
+//        //用user的id去user_notice表中找到对应被通知用户的id，如果有，且消息没看，则返回消息内容
+//        if (userNoticeMapper.selectCountByViewAndUserId(userNotice) != null &&userNoticeMapper.selectCountByViewAndUserId(userNotice).size() != 0) {
+//                List<String> masg = userNoticeMapper.selectCountByViewAndUserId(userNotice);
+//                userNotice.setView(1);
+//                //用户查看了消息，将View字段更新为1
+//                for (int i = 0; i < masg.size(); i++) {
+//                    String massage = masg.get(i);
+//                    userNotice.setContent(massage);
+//                    userNoticeMapper.updateByUser_id(userNotice);
+//                }
+//                return ServerResponse.createBySuccess(masg);
+//        }
+//        else {
+//            return ServerResponse.createBySuccess("no message");
+//        }
+//    }
+
+
+//    //所有消息通知
+//    public ServerResponse AllInform(User user){
+//        //发出此动作的一定是登陆的用户
+//        //否则越权操作
+//        if (user.getId() == null) {
+//            return ServerResponse.create(
+//                    ResponseCode.UNAUTHORIZED_OPERATION.getCode(), ResponseCode.UNAUTHORIZED_OPERATION.getDesc());
+//        }
+//        UserNotice userNotice = new UserNotice();
+//        userNotice.setUserId(user.getId());
+//        //将有关此用户的消息全都显示出来
+//        if (userNoticeMapper.selectCountByUserId(userNotice) != null && userNoticeMapper.selectCountByUserId(userNotice).size() != 0){
+//            List<String> Allmasg = userNoticeMapper.selectCountByUserId(userNotice);
+//            return  ServerResponse.createBySuccess(Allmasg);
+//        }
+//        else
+//            return ServerResponse.createBySuccess("no Message");
+//    }
 

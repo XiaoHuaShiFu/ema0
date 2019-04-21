@@ -12,6 +12,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -183,21 +184,25 @@ public class UserController {
 
     // TODO: 2019/4/20 用户的新通知通知模块
     @RequestMapping(value = "NewInform.do")
-    public ServerResponse inform(HttpSession session){
+    public ServerResponse inform(HttpSession session,
+                                 @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+                                 @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
         User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
         if(sessionUser == null){
             return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
         }
-        return iUserService.Inform(sessionUser);
+        return iUserService.NewInform(sessionUser,pageNum,pageSize);
     }
 
     // TODO: 2019/4/20 用户的所有通知通知模块
     @RequestMapping(value = "AllInform.do")
-    public ServerResponse AllInform(HttpSession session){
+    public ServerResponse AllInform(HttpSession session,
+                                    @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+                                    @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
         User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
         if(sessionUser == null){
             return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
         }
-        return iUserService.AllInform(sessionUser);
+        return iUserService.AllInform(sessionUser,pageNum,pageSize);
     }
 }

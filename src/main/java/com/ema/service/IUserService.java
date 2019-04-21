@@ -27,8 +27,8 @@ public interface IUserService {
 
     ServerResponse follow(User user, Integer userFollow);
 
-    ServerResponse Inform(User user);
+    ServerResponse NewInform(User user, int pageNum, int pageSize);
 
-    ServerResponse AllInform(User user);
+    ServerResponse AllInform(User user, int pageNum, int pageSize);
 
 }
