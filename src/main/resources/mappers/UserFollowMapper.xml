@@ -10,9 +10,21 @@
     </constructor>
   </resultMap>
   <insert id="insert" parameterType="com.ema.pojo.UserFollow" >
-    insert into user_follow (followeder_id, follower_id)
-    values (#{followederId,jdbcType=INTEGER}, #{followerId,jdbcType=INTEGER})
+        insert
+    into user_follow
+    (followeder_id, follower_id)
+    select
+    #{followederId},#{followerId}
+    from DUAL
+    where not exists (
+        select
+        *
+        from user_follow
+        where followeder_id = #{followederId,jdbcType=INTEGER}
+        and follower_id =  #{followerId,jdbcType=INTEGER}
+    )
   </insert>
+
 
   <select id="selectCountByFollowederIdAndFollowerId" parameterType="com.ema.pojo.UserFollow" resultType="int">
     SELECT
@@ -28,4 +40,5 @@
     WHERE followeder_id = #{followederId}
     AND follower_id = #{followerId}
   </delete>
+
 </mapper>

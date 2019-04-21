@@ -25,5 +25,7 @@ public interface IUserService {
 
     ServerResponse register(String code, User user);
 
-    ServerResponse follow(User user, UserFollow userFollow);
+    ServerResponse follow(User user, Integer userFollow);
+
+    ServerResponse Inform(User user);
 }

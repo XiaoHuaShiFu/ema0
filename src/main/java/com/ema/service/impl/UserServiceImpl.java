@@ -4,23 +4,32 @@ import com.ema.common.ResponseCode;
 import com.ema.common.ServerResponse;
 import com.ema.dao.UserFollowMapper;
 import com.ema.dao.UserMapper;
+import com.ema.dao.UserNoticeMapper;
 import com.ema.pojo.User;
 import com.ema.pojo.UserFollow;
+import com.ema.pojo.UserNotice;
 import com.ema.pojo.WechatBody;
 import com.ema.service.IFileService;
 import com.ema.service.IUserService;
 import com.ema.util.PropertiesUtil;
 import com.google.gson.Gson;
+import com.sun.org.apache.xml.internal.security.Init;
 import org.apache.commons.lang3.StringUtils;
+import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
 
@@ -50,6 +59,9 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private IFileService iFileService;
+
+    @Autowired
+    private UserNoticeMapper userNoticeMapper;
 
     /**
      * 用户登录
@@ -211,36 +223,38 @@ public class UserServiceImpl implements IUserService {
             return ServerResponse.createByErrorMessage("followeder not exist");
         }
 
-        //查找数据库里是否有关注双方的id对
-        rowCount = userFollowMapper.selectCountByFollowederIdAndFollowerId(userFollow);
-        //小于1表明未关注，进行关注操作
-        // TODO: 2019/4/3 由于对事务不熟悉，这块就先不完善
-        if (rowCount < 1) {
-            // TODO: 2019/4/3 这里应该是通过事务管理确保数据完整性
-            // TODO: 2019/4/3 且这个模块应该是对于这个用户对是原子的
-            //保存关注双方的用户id对
-            userFollowMapper.insert(userFollow);
-            //被关注者的粉丝数+1
-            userMapper.updateByIdIncrFollowers(userFollow.getFollowederId());
-            //关注者的关注数+1
-            userMapper.updateByIdIncrFollowings(userFollow.getFollowerId());
-            //关注成功
-            return ServerResponse.createBySuccess("follow success");
-        }
-        //否则表明已经关注，进行取关操作
-        else {
-            // TODO: 2019/4/3 这里应该是通过事务管理确保数据完整性
-            // TODO: 2019/4/3 且这个模块应该是对于这个用户对是原子的
-            //删除关注双方的用户id对
-            userFollowMapper.deleteByFollowederIdAndFollowerId(userFollow);
-            //被关注者的粉丝数-1
-            userMapper.updateByIdDecrFollowers(userFollow.getFollowederId());
-            //关注者的关注数-1
-            userMapper.updateByIdDecrFollowings(userFollow.getFollowerId());
-            //取消关注成功
-            return ServerResponse.createBySuccess("unfollow success");
-        }
+//        //查找数据库里是否有关注双方的id对
+//        rowCount = userFollowMapper.selectCountByFollowederIdAndFollowerId(userFollow);
+//        //小于1表明未关注，进行关注操作
+//        // TODO: 2019/4/3 由于对事务不熟悉，这块就先不完善
+//        if (rowCount < 1) {
+//            // TODO: 2019/4/3 这里应该是通过事务管理确保数据完整性
+//            // TODO: 2019/4/3 且这个模块应该是对于这个用户对是原子的
+//            //保存关注双方的用户id对
+//            userFollowMapper.insert(userFollow);
+//            //被关注者的粉丝数+1
+//            userMapper.updateByIdIncrFollowers(userFollow.getFollowederId());
+//            //关注者的关注数+1
+//            userMapper.updateByIdIncrFollowings(userFollow.getFollowerId());
+//            //关注成功
+//            return ServerResponse.createBySuccess("follow success");
+//        }
+//        //否则表明已经关注，进行取关操作
+//        else {
+//            // TODO: 2019/4/3 这里应该是通过事务管理确保数据完整性
+//            // TODO: 2019/4/3 且这个模块应该是对于这个用户对是原子的
+//            //删除关注双方的用户id对
+//            userFollowMapper.deleteByFollowederIdAndFollowerId(userFollow);
+//            //被关注者的粉丝数-1
+//            userMapper.updateByIdDecrFollowers(userFollow.getFollowederId());
+//            //关注者的关注数-1
+//            userMapper.updateByIdDecrFollowings(userFollow.getFollowerId());
+//            //取消关注成功
+//            return ServerResponse.createBySuccess("unfollow success");
+//        }
+        return null;
     }
+
 
     /**
      * 删除用户的旧头像
@@ -297,4 +311,85 @@ public class UserServiceImpl implements IUserService {
         return user;
     }
 
+    //关注用户
+    public ServerResponse follow(User user, Integer followederId){
+
+        //从上面copy的
+        //发出此动作的用户一定是关注者
+        //所以此用户的id应该等于关注者id
+        //否则返回越权操作错误
+        if (user.getId() == null || user.getId().equals(followederId)) {
+            return ServerResponse.create(
+                    ResponseCode.UNAUTHORIZED_OPERATION.getCode(), ResponseCode.UNAUTHORIZED_OPERATION.getDesc());
+        }
+
+        //检查被关注者是否存在数据库里
+        int rowCount = userMapper.selectCountById(followederId);
+        //被关注者不存在
+        if(rowCount < 1) {
+            return ServerResponse.createByErrorMessage("followeder not exist");
+        }
+
+        UserFollow userFollow = new UserFollow();
+        userFollow.setFollowederId(followederId);//被关注人的id
+        userFollow.setFollowerId(user.getId());//关注人的id
+
+        //查找数据库里是否有关注双方的id对
+        int rowCount2 = userFollowMapper.selectCountByFollowederIdAndFollowerId(userFollow);
+        //小于1表明未关注，进行关注操作
+        // TODO: 2019/4/3 由于对事务不熟悉，这块就先不完善
+        if (rowCount2 < 1) {
+            // TODO: 2019/4/3 这里应该是通过事务管理确保数据完整性
+            // TODO: 2019/4/3 且这个模块应该是对于这个用户对是原子的
+            //保存关注双方的用户id对
+            userFollowMapper.insert(userFollow);
+            //被关注者的粉丝数+1
+            userMapper.updateByIdIncrFollowers(userFollow.getFollowederId());
+            //关注者的关注数+1
+            userMapper.updateByIdIncrFollowings(userFollow.getFollowerId());
+            //关注成功
+            return ServerResponse.createBySuccess("follow success");
+        }
+        //否则表明已经关注，进行取关操作
+        else {
+            // TODO: 2019/4/3 这里应该是通过事务管理确保数据完整性
+            // TODO: 2019/4/3 且这个模块应该是对于这个用户对是原子的
+            //删除关注双方的用户id对
+            userFollowMapper.deleteByFollowederIdAndFollowerId(userFollow);
+            //被关注者的粉丝数-1
+            userMapper.updateByIdDecrFollowers(userFollow.getFollowederId());
+            //关注者的关注数-1
+            userMapper.updateByIdDecrFollowings(userFollow.getFollowerId());
+            //取消关注成功
+            return ServerResponse.createBySuccess("unfollow success");
+        }
+    }
+
+    //消息通知
+    public ServerResponse Inform(User user){
+        //发出此动作的一定是登陆的用户
+        //否则越权操作
+        if (user.getId() == null) {
+            return ServerResponse.create(
+                    ResponseCode.UNAUTHORIZED_OPERATION.getCode(), ResponseCode.UNAUTHORIZED_OPERATION.getDesc());
+        }
+        UserNotice userNotice = new UserNotice();
+        userNotice.setUserId(user.getId());
+        userNotice.setView(0);
+        //用user的id去user_notice表中找到对应被通知用户的id，如果有，且消息没看，则返回消息内容
+        if (userNoticeMapper.selectCountByViewAndUserId(userNotice) != null &&userNoticeMapper.selectCountByViewAndUserId(userNotice).size()!=0) {
+                List<String> masg = userNoticeMapper.selectCountByViewAndUserId(userNotice);
+                userNotice.setView(1);
+                //用户查看了消息，将View字段更新为1
+                for (int i = 0; i < masg.size(); i++) {
+                    String massage = masg.get(i);
+                    userNotice.setContent(massage);
+                    userNoticeMapper.updateByUser_id(userNotice);
+                }
+                return ServerResponse.createBySuccess(masg);
+        }
+        else {
+            return ServerResponse.createBySuccess("no message");
+        }
+    }
 }

@@ -21,6 +21,7 @@
     id, user_id, type, notice_time, title, content, incident_id, follower_id, commenter_id, 
     incident_scnd_comment_id, create_time, update_time
   </sql>
+
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
     <include refid="Base_Column_List" />
@@ -32,14 +33,14 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.ema.pojo.UserNotice" >
-    insert into user_notice (id, user_id, type, 
-      notice_time, title, content, 
-      incident_id, follower_id, commenter_id, 
+    insert into user_notice (id, user_id, view, type,
+      notice_time, title, content,
+      incident_id, follower_id, commenter_id,
       incident_scnd_comment_id, create_time
       )
-    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{type,jdbcType=SMALLINT}, 
-      #{noticeTime,jdbcType=TIMESTAMP}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, 
-      #{incidentId,jdbcType=INTEGER}, #{followerId,jdbcType=INTEGER}, #{commenterId,jdbcType=INTEGER}, 
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{view,jdbcType=INTEGER}, #{type,jdbcType=SMALLINT},
+      #{noticeTime,jdbcType=TIMESTAMP}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
+      #{incidentId,jdbcType=INTEGER}, #{followerId,jdbcType=INTEGER}, #{commenterId,jdbcType=INTEGER},
       #{incidentScndCommentId,jdbcType=INTEGER}, now()
       )
   </insert>
@@ -158,4 +159,32 @@
       incident_scnd_comment_id = #{incidentScndCommentId,jdbcType=INTEGER},
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="selectCountByViewAndUserId" parameterType="com.ema.pojo.UserNotice" resultType="string" >
+    SELECT
+    content
+    FROM user_notice
+    WHERE view = #{view}
+    AND user_id = #{userId,jdbcType=INTEGER}
+  </select>
+
+  <update id="updateByUser_id" parameterType="com.ema.pojo.UserNotice" >
+    update user_notice
+    set view = 1
+    where user_id = #{userId,jdbcType=INTEGER}
+    AND content= #{content,jdbcType=VARCHAR}
+  </update>
+
+  <select id="selectViewOrNot" parameterType="com.ema.pojo.UserNotice" resultType="int">
+    SELECT
+    COUNT(1)
+    FROM user_notice
+    WHERE
+    view = #{view}
+    AND user_id = #{userId,jdbcType=INTEGER}
+    AND follower_id = #{followerId,jdbcType=INTEGER}
+    AND type = #{type,jdbcType=SMALLINT}
+    AND content= #{content,jdbcType=VARCHAR}
+  </select>
+
 </mapper>

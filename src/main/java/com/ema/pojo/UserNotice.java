@@ -7,6 +7,8 @@ public class UserNotice {
 
     private Integer userId;
 
+    private Integer view;
+
     private Short type;
 
     private Date noticeTime;
@@ -27,9 +29,10 @@ public class UserNotice {
 
     private Date updateTime;
 
-    public UserNotice(Integer id, Integer userId, Short type, Date noticeTime, String title, String content, Integer incidentId, Integer followerId, Integer commenterId, Integer incidentScndCommentId, Date createTime, Date updateTime) {
+    public UserNotice(Integer id, Integer userId, Integer view, Short type, Date noticeTime, String title, String content, Integer incidentId, Integer followerId, Integer commenterId, Integer incidentScndCommentId, Date createTime, Date updateTime) {
         this.id = id;
         this.userId = userId;
+        this.view = view;
         this.type = type;
         this.noticeTime = noticeTime;
         this.title = title;
@@ -61,6 +64,10 @@ public class UserNotice {
     public void setUserId(Integer userId) {
         this.userId = userId;
     }
+
+    public Integer getView(){return  view;}
+
+    public void setView(Integer view){ this.view = view;}
 
     public Short getType() {
         return type;

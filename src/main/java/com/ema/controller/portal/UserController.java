@@ -6,7 +6,10 @@ import com.ema.common.ServerResponse;
 import com.ema.pojo.User;
 import com.ema.pojo.UserFollow;
 import com.ema.service.IUserService;
+import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -165,16 +168,26 @@ public class UserController {
     }
 
 
+
     // TODO: 2019/4/3 follow功能未完成
     @RequestMapping(value = "follow.do")
-    public ServerResponse follow(HttpSession session, UserFollow userFollow) {
+    public ServerResponse follow(HttpSession session, Integer followederId){
+
         User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
-        if (sessionUser == null) {
-            return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+        if(sessionUser == null){
+            return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
         }
-        return iUserService.follow(sessionUser, userFollow);
+        return iUserService.follow(sessionUser,followederId);
     }
 
 
-    // TODO: 2019/4/10 用户的通知模块未做
+    // TODO: 2019/4/10 用户的通知模块
+    @RequestMapping(value = "inform.do")
+    public ServerResponse inform(HttpSession session){
+        User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
+        if(sessionUser == null){
+            return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
+        }
+        return iUserService.Inform(sessionUser);
+    }
 }

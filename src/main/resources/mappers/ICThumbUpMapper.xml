@@ -10,7 +10,7 @@
     </constructor>
   </resultMap>
   <insert id="insert" parameterType="com.ema.pojo.ICThumbUp" >
-    insert into ic_thumb_up (u_id, ic_id, create_time, 
+    insert  into ic_thumb_up (u_id, ic_id, create_time,
       update_time)
     values (#{uId,jdbcType=INTEGER}, #{icId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP})

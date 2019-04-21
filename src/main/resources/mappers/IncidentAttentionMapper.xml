@@ -43,4 +43,5 @@
     AND incident_id = #{incidentId}
   </delete>
 
+
 </mapper>
