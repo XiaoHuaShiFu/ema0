@@ -169,7 +169,7 @@ public class UserController {
 
 
 
-    // TODO: 2019/4/3 follow功能未完成
+    // TODO: 2019/4/3 follow功能
     @RequestMapping(value = "follow.do")
     public ServerResponse follow(HttpSession session, Integer followederId){
 
@@ -181,13 +181,23 @@ public class UserController {
     }
 
 
-    // TODO: 2019/4/10 用户的通知模块
-    @RequestMapping(value = "inform.do")
+    // TODO: 2019/4/20 用户的新通知通知模块
+    @RequestMapping(value = "NewInform.do")
     public ServerResponse inform(HttpSession session){
         User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
         if(sessionUser == null){
             return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
         }
         return iUserService.Inform(sessionUser);
+    }
+
+    // TODO: 2019/4/20 用户的所有通知通知模块
+    @RequestMapping(value = "AllInform.do")
+    public ServerResponse AllInform(HttpSession session){
+        User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
+        if(sessionUser == null){
+            return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
+        }
+        return iUserService.AllInform(sessionUser);
     }
 }

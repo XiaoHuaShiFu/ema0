@@ -28,4 +28,7 @@ public interface IUserService {
     ServerResponse follow(User user, Integer userFollow);
 
     ServerResponse Inform(User user);
+
+    ServerResponse AllInform(User user);
+
 }

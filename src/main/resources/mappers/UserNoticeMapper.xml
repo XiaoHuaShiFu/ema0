@@ -168,6 +168,13 @@
     AND user_id = #{userId,jdbcType=INTEGER}
   </select>
 
+  <select id="selectCountByUserId" parameterType="com.ema.pojo.UserNotice" resultType="string">
+    SELECT
+    content
+    FROM user_notice
+    WHERE user_id = #{userId,jdbcType=INTEGER}
+  </select>
+
   <update id="updateByUser_id" parameterType="com.ema.pojo.UserNotice" >
     update user_notice
     set view = 1

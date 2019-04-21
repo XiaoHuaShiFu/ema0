@@ -365,7 +365,7 @@ public class UserServiceImpl implements IUserService {
         }
     }
 
-    //消息通知
+    //新消息通知
     public ServerResponse Inform(User user){
         //发出此动作的一定是登陆的用户
         //否则越权操作
@@ -377,7 +377,7 @@ public class UserServiceImpl implements IUserService {
         userNotice.setUserId(user.getId());
         userNotice.setView(0);
         //用user的id去user_notice表中找到对应被通知用户的id，如果有，且消息没看，则返回消息内容
-        if (userNoticeMapper.selectCountByViewAndUserId(userNotice) != null &&userNoticeMapper.selectCountByViewAndUserId(userNotice).size()!=0) {
+        if (userNoticeMapper.selectCountByViewAndUserId(userNotice) != null &&userNoticeMapper.selectCountByViewAndUserId(userNotice).size() != 0) {
                 List<String> masg = userNoticeMapper.selectCountByViewAndUserId(userNotice);
                 userNotice.setView(1);
                 //用户查看了消息，将View字段更新为1
@@ -392,4 +392,24 @@ public class UserServiceImpl implements IUserService {
             return ServerResponse.createBySuccess("no message");
         }
     }
+
+    //所有消息通知
+    public ServerResponse AllInform(User user){
+        //发出此动作的一定是登陆的用户
+        //否则越权操作
+        if (user.getId() == null) {
+            return ServerResponse.create(
+                    ResponseCode.UNAUTHORIZED_OPERATION.getCode(), ResponseCode.UNAUTHORIZED_OPERATION.getDesc());
+        }
+        UserNotice userNotice = new UserNotice();
+        userNotice.setUserId(user.getId());
+        //将有关此用户的消息全都显示出来
+        if (userNoticeMapper.selectCountByUserId(userNotice) != null && userNoticeMapper.selectCountByUserId(userNotice).size() != 0){
+            List<String> Allmasg = userNoticeMapper.selectCountByUserId(userNotice);
+            return  ServerResponse.createBySuccess(Allmasg);
+        }
+        else
+            return ServerResponse.createBySuccess("no Message");
+    }
 }
+
