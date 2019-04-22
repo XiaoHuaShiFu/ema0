@@ -27,10 +27,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -419,6 +421,7 @@ public class UserServiceImpl implements IUserService {
      * @param pageSize 页条数
      * @return 用户关注的事件列表
      */
+
     public ServerResponse AllInform(User user, int pageNum, int pageSize){
         //发出此动作的一定是登陆的用户
         //否则越权操作
@@ -426,23 +429,23 @@ public class UserServiceImpl implements IUserService {
             return ServerResponse.create(
                     ResponseCode.UNAUTHORIZED_OPERATION.getCode(), ResponseCode.UNAUTHORIZED_OPERATION.getDesc());
         }
-        PageInfo<String> Allmasg = new PageInfo<>(
-                getAllInform(user, pageNum, pageSize));
+        PageInfo<UserNotice> Allmasg = new PageInfo<>(
+                UserNoticeList(user, pageNum, pageSize));
         return ServerResponse.createBySuccess(Allmasg);
     }
-    private List<String> getAllInform(User user, int pageNum, int pageSize){
+    public List<UserNotice> UserNoticeList(User user, int pageNum, int pageSize){
         PageHelper.startPage(pageNum, pageSize);
         UserNotice userNotice = new UserNotice();
         userNotice.setUserId(user.getId());
         //将有关此用户的消息全都显示出来
-        if (userNoticeMapper.selectCountByUserId(userNotice) != null && userNoticeMapper.selectCountByUserId(userNotice).size() != 0){
-            List<String> Allmasg = userNoticeMapper.selectCountByUserId(userNotice);
-            return Allmasg;
+        if (userNoticeMapper.selectCountByUserId(user.getId()) != null && userNoticeMapper.selectCountByUserId(user.getId()).size() != 0){
+            List<UserNotice> userNoticeList = userNoticeMapper.selectCountByUserId(user.getId());
+            return userNoticeList;
         }
         else
             return null;
     }
-    }
+}
 
 
 

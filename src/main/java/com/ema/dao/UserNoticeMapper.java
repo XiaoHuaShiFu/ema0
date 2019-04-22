@@ -19,7 +19,7 @@ public interface UserNoticeMapper {
 
     List<String> selectCountByViewAndUserId(UserNotice record);
 
-    List<String> selectCountByUserId(UserNotice record);
+    List<UserNotice> selectCountByUserId(Integer id);
 
     int updateByUser_id(UserNotice record);
 

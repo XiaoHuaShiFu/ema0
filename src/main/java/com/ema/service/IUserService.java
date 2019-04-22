@@ -3,7 +3,10 @@ package com.ema.service;
 import com.ema.common.ServerResponse;
 import com.ema.pojo.User;
 import com.ema.pojo.UserFollow;
+import com.ema.pojo.UserNotice;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 /**
  * 描述:
@@ -30,5 +33,7 @@ public interface IUserService {
     ServerResponse NewInform(User user, int pageNum, int pageSize);
 
     ServerResponse AllInform(User user, int pageNum, int pageSize);
+
+    List<UserNotice> UserNoticeList(User user, int pageNum, int pageSize);
 
 }
