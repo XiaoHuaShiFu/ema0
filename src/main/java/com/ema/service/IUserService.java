@@ -34,6 +34,4 @@ public interface IUserService {
 
     ServerResponse AllInform(User user, int pageNum, int pageSize);
 
-    List<UserNotice> UserNoticeList(User user, int pageNum, int pageSize);
-
 }

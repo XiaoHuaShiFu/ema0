@@ -17,7 +17,7 @@ public interface UserNoticeMapper {
 
     int updateByPrimaryKey(UserNotice record);
 
-    List<String> selectCountByViewAndUserId(UserNotice record);
+    List<UserNotice> selectCountByViewAndUserId(UserNotice record);
 
     List<UserNotice> selectCountByUserId(Integer id);
 

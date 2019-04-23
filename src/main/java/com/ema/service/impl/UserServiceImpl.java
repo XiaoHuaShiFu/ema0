@@ -11,7 +11,9 @@ import com.ema.pojo.UserNotice;
 import com.ema.pojo.WechatBody;
 import com.ema.service.IFileService;
 import com.ema.service.IUserService;
+import com.ema.util.DateTimeUtil;
 import com.ema.util.PropertiesUtil;
+import com.ema.vo.UserNoticeVo;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.gson.Gson;
@@ -378,7 +380,6 @@ public class UserServiceImpl implements IUserService {
      * @param pageSize 页条数
      * @return 用户关注的事件列表
      */
-
     public ServerResponse NewInform(User user, int pageNum, int pageSize){
         //发出此动作的一定是登陆的用户
         //否则越权操作
@@ -386,34 +387,37 @@ public class UserServiceImpl implements IUserService {
             return ServerResponse.create(
                     ResponseCode.UNAUTHORIZED_OPERATION.getCode(), ResponseCode.UNAUTHORIZED_OPERATION.getDesc());
         }
-        PageInfo<String> Newmasg = new PageInfo<>(
-                getNewInform(user, pageNum, pageSize));
+        PageInfo<UserNoticeVo> Newmasg = new PageInfo<>(
+                getUserNewNoticeVoList(user, pageNum, pageSize));
         return ServerResponse.createBySuccess(Newmasg);
     }
 
-    private List<String> getNewInform(User user, int pageNum, int pageSize){
+    private List<UserNoticeVo> getUserNewNoticeVoList(User user, int pageNum, int pageSize){
         PageHelper.startPage(pageNum, pageSize);
+        List<UserNoticeVo> UserNewNoticeVoList = new ArrayList<>();
         UserNotice userNotice = new UserNotice();
         userNotice.setUserId(user.getId());
         userNotice.setView(0);
-        //用user的id去user_notice表中找到对应被通知用户的id，如果有，且消息没看，则返回消息内容
         if (userNoticeMapper.selectCountByViewAndUserId(userNotice) != null &&userNoticeMapper.selectCountByViewAndUserId(userNotice).size() != 0) {
-                List<String> NewmasgList = userNoticeMapper.selectCountByViewAndUserId(userNotice);
-                userNotice.setView(1);
-                //用户查看了消息，将View字段更新为1
-                for (int i = 0; i < NewmasgList.size(); i++) {
-                    String massage = NewmasgList.get(i);
-                    userNotice.setContent(massage);
-                    userNoticeMapper.updateByUser_id(userNotice);
-                }
-                return NewmasgList;
+            List<UserNotice> NewmasgList = userNoticeMapper.selectCountByViewAndUserId(userNotice);
+            for (UserNotice i : NewmasgList){
+                UserNewNoticeVoList.add(assembleUserNoticeVo(i));
+            }
+            userNotice.setView(1);
+            //用户查看了消息，将View字段更新为1 （用户id，view为0并且信息相同的）
+            for (int i = 0; i < NewmasgList.size(); i++) {
+                UserNotice massage = NewmasgList.get(i);
+                userNotice.setContent(massage.getContent());
+                userNoticeMapper.updateByUser_id(userNotice);
+            }
+            return UserNewNoticeVoList;
         }
         else {
             return null;
         }
     }
 
-    /**
+        /**
      * 获取用户所有通知的事件列表
      *
      * @param user 发出请求的用户
@@ -421,31 +425,87 @@ public class UserServiceImpl implements IUserService {
      * @param pageSize 页条数
      * @return 用户关注的事件列表
      */
-
-    public ServerResponse AllInform(User user, int pageNum, int pageSize){
-        //发出此动作的一定是登陆的用户
-        //否则越权操作
-        if (user.getId() == null) {
-            return ServerResponse.create(
-                    ResponseCode.UNAUTHORIZED_OPERATION.getCode(), ResponseCode.UNAUTHORIZED_OPERATION.getDesc());
-        }
-        PageInfo<UserNotice> Allmasg = new PageInfo<>(
-                UserNoticeList(user, pageNum, pageSize));
-        return ServerResponse.createBySuccess(Allmasg);
+    public ServerResponse AllInform(User user, int pageNum, int pageSize) {
+        PageInfo<UserNoticeVo> result = new PageInfo<>(getUserNoticeVoList(user, pageNum, pageSize));
+        return ServerResponse.createBySuccess(result);
     }
-    public List<UserNotice> UserNoticeList(User user, int pageNum, int pageSize){
+
+    private List<UserNoticeVo> getUserNoticeVoList(User user, int pageNum, int pageSize){
         PageHelper.startPage(pageNum, pageSize);
-        UserNotice userNotice = new UserNotice();
-        userNotice.setUserId(user.getId());
-        //将有关此用户的消息全都显示出来
+        List<UserNoticeVo> UserNoticeVoList = new ArrayList<>();
         if (userNoticeMapper.selectCountByUserId(user.getId()) != null && userNoticeMapper.selectCountByUserId(user.getId()).size() != 0){
             List<UserNotice> userNoticeList = userNoticeMapper.selectCountByUserId(user.getId());
-            return userNoticeList;
+            for (UserNotice i : userNoticeList){
+                UserNoticeVoList.add(assembleUserNoticeVo(i));
+            }
+            return UserNoticeVoList;
         }
         else
             return null;
     }
+
+    /**
+     * 装配UserNoticeVo
+     *
+     * @param userNotice
+     * @return
+     */
+    private UserNoticeVo assembleUserNoticeVo(UserNotice userNotice){
+        UserNoticeVo userNoticeVo = new UserNoticeVo();
+        userNoticeVo.setCommenterId(userNotice.getCommenterId());
+        userNoticeVo.setContent(userNotice.getContent());
+        userNoticeVo.setCreateTime(DateTimeUtil.dateToStr(userNotice.getCreateTime()));
+        userNoticeVo.setFollowerId(userNotice.getFollowerId());
+        userNoticeVo.setId(userNotice.getId());
+        userNoticeVo.setIncidentId(userNotice.getIncidentId());
+        userNoticeVo.setIncidentScndCommentId(userNotice.getIncidentScndCommentId());
+        userNoticeVo.setNoticeTime(DateTimeUtil.dateToStr(userNotice.getNoticeTime()));
+        userNoticeVo.setTitle(userNotice.getTitle());
+        userNoticeVo.setType(userNotice.getType());
+        userNoticeVo.setUpdateTime(DateTimeUtil.dateToStr(userNotice.getUpdateTime()));
+        userNoticeVo.setUserId(userNotice.getUserId());
+        userNoticeVo.setView(userNotice.getView());
+        return userNoticeVo;
+    }
 }
+//
+//public ServerResponse getViewList(Integer userId, int pageNum, int pageSize) {
+//    PageInfo<IncidentViewVo> result = new PageInfo<>(getIncidentViewVoList(userId, pageNum, pageSize));
+//    return ServerResponse.createBySuccess(result);
+//}
+//
+//private List<IncidentViewVo> getIncidentViewVoList(Integer userId, int pageNum, int pageSize) {
+//    PageHelper.startPage(pageNum, pageSize);
+//    List<IncidentView> incidentViewList = incidentViewMapper.selectByUserId(userId);
+//    if (incidentViewList == null) {
+//        return null;
+//    }
+//    List<IncidentViewVo> incidentViewVoList = new ArrayList<>();
+//    for (IncidentView i : incidentViewList) {
+//        Incident incident = incidentMapper.selectByPrimaryKey(i.getIncidentId());
+//        incidentViewVoList.add(assembleIncidentViewVo(i, incident));
+//    }
+//    return incidentViewVoList;
+//}
+//
+//    private IncidentVo assembleIncidentVo(Incident incident) {
+//        IncidentVo incidentVo = new IncidentVo();
+//        incidentVo.setId(incident.getId());
+//        incidentVo.setAnon(incident.getAnon());
+//        incidentVo.setViews(incident.getViews());
+//        incidentVo.setAttentions(incident.getAttentions());
+//        incidentVo.setComments(incident.getComments());
+//        incidentVo.setTitle(incident.getTitle());
+//        incidentVo.setOccurTime(DateTimeUtil.dateToStr(incident.getOccurTime()));
+//        incidentVo.setAddress(incident.getAddress());
+//        incidentVo.setAddressName(incident.getAddressName());
+//        incidentVo.setDescription(incident.getDescription());
+//        incidentVo.setMainImageUrl(incident.getMainImageUrl());
+//        incidentVo.setMainVideoUrl(incident.getMainVideoUrl());
+//        incidentVo.setLatitude(incident.getLatitude());
+//        incidentVo.setLongitude(incident.getLongitude());
+//        return incidentVo;
+//    }
 
 
 

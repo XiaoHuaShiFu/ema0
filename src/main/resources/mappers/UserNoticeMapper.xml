@@ -5,6 +5,7 @@
     <constructor >
       <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer" />
       <arg column="user_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="view" jdbcType="INTEGER" javaType="java.lang.Integer"/>
       <arg column="type" jdbcType="SMALLINT" javaType="java.lang.Short" />
       <arg column="notice_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
       <arg column="title" jdbcType="VARCHAR" javaType="java.lang.String" />
@@ -18,7 +19,7 @@
     </constructor>
   </resultMap>
   <sql id="Base_Column_List" >
-    id, user_id, type, notice_time, title, content, incident_id, follower_id, commenter_id, 
+    id, user_id, view, type, notice_time, title, content, incident_id, follower_id, commenter_id,
     incident_scnd_comment_id, create_time, update_time
   </sql>
 
@@ -160,9 +161,9 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
 
-  <select id="selectCountByViewAndUserId" parameterType="com.ema.pojo.UserNotice" resultType="string" >
+  <select id="selectCountByViewAndUserId" parameterType="com.ema.pojo.UserNotice" resultMap="BaseResultMap">
     SELECT
-    content
+    <include refid="Base_Column_List" />
     FROM user_notice
     WHERE view = #{view}
     AND user_id = #{userId,jdbcType=INTEGER}
