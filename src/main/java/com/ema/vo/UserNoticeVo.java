@@ -1,8 +1,8 @@
-package com.ema.pojo;
+package com.ema.vo;
 
 import java.util.Date;
 
-public class UserNotice {
+public class UserNoticeVo {
     private Integer id;
 
     private Integer userId;
@@ -11,7 +11,7 @@ public class UserNotice {
 
     private Short type;
 
-    private Date noticeTime;
+    private String noticeTime;
 
     private String title;
 
@@ -25,29 +25,9 @@ public class UserNotice {
 
     private Integer incidentScndCommentId;
 
-    private Date createTime;
+    private String createTime;
 
-    private Date updateTime;
-
-    public UserNotice(Integer id, Integer userId, Integer view, Short type, Date noticeTime, String title, String content, Integer incidentId, Integer followerId, Integer commenterId, Integer incidentScndCommentId, Date createTime, Date updateTime) {
-        this.id = id;
-        this.userId = userId;
-        this.view = view;
-        this.type = type;
-        this.noticeTime = noticeTime;
-        this.title = title;
-        this.content = content;
-        this.incidentId = incidentId;
-        this.followerId = followerId;
-        this.commenterId = commenterId;
-        this.incidentScndCommentId = incidentScndCommentId;
-        this.createTime = createTime;
-        this.updateTime = updateTime;
-    }
-
-    public UserNotice() {
-        super();
-    }
+    private String updateTime;
 
     public Integer getId() {
         return id;
@@ -65,9 +45,13 @@ public class UserNotice {
         this.userId = userId;
     }
 
-    public Integer getView(){return  view;}
+    public Integer getView() {
+        return view;
+    }
 
-    public void setView(Integer view){ this.view = view;}
+    public void setView(Integer view) {
+        this.view = view;
+    }
 
     public Short getType() {
         return type;
@@ -77,11 +61,11 @@ public class UserNotice {
         this.type = type;
     }
 
-    public Date getNoticeTime() {
+    public String getNoticeTime() {
         return noticeTime;
     }
 
-    public void setNoticeTime(Date noticeTime) {
+    public void setNoticeTime(String noticeTime) {
         this.noticeTime = noticeTime;
     }
 
@@ -90,7 +74,7 @@ public class UserNotice {
     }
 
     public void setTitle(String title) {
-        this.title = title == null ? null : title.trim();
+        this.title = title;
     }
 
     public String getContent() {
@@ -98,7 +82,7 @@ public class UserNotice {
     }
 
     public void setContent(String content) {
-        this.content = content == null ? null : content.trim();
+        this.content = content;
     }
 
     public Integer getIncidentId() {
@@ -133,19 +117,19 @@ public class UserNotice {
         this.incidentScndCommentId = incidentScndCommentId;
     }
 
-    public Date getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
 
-    public Date getUpdateTime() {
+    public String getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(Date updateTime) {
+    public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
     }
 }
