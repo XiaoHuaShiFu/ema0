@@ -45,7 +45,7 @@
     <servlet>
         <servlet-name>dispatcher</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-        <load-on-stspringmvcartup>1</load-on-stspringmvcartup><!--如果大于0Servlet启动时会调用servlet-class的init方法-->
+        <load-on-startup>1</load-on-startup><!--如果大于0Servlet启动时会调用servlet-class的init方法-->
     </servlet>
 
 
