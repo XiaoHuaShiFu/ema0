@@ -289,4 +289,12 @@
     WHERE user_id = #{userId}
   </select>
 
+
+  <select id="selectListByTitle" parameterType="string" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM incident
+    WHERE title LIKE #{title}
+  </select>
+
 </mapper>

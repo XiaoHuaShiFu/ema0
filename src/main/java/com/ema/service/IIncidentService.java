@@ -36,4 +36,6 @@ public interface IIncidentService {
     ServerResponse getAttentionList(Integer userId, int pageNum, int pageSize);
 
     ServerResponse getReportList(Integer userId, int pageNum, int pageSize);
+
+    ServerResponse getIncidentListByTitle(String title, int pageNum, int pageSize);
 }

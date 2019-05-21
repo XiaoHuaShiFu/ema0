@@ -358,6 +358,21 @@ public class IncidentServiceImpl implements IIncidentService{
     }
 
     /**
+     * 获取事件列表，通过标题，模糊匹配
+     * @param title 文章标题
+     * @param pageNum 页码
+     * @param pageSize 页条数
+     * @return 返回搜索的结果列表
+     */
+    public ServerResponse getIncidentListByTitle(String title, int pageNum, int pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
+        List<Incident> incidentList = incidentMapper.selectListByTitle("%" + title + "%");
+        List<IncidentVo> incidentVoList = assembleIncidentVoList(incidentList);
+        PageInfo<IncidentVo> result = new PageInfo<>(incidentVoList);
+        return ServerResponse.createBySuccess(result);
+    }
+
+    /**
      * 获取UserReportIncidentVoList
      *
      * @param userId 发出请求的用户id

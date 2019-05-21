@@ -261,4 +261,11 @@ public class IncidentController {
         return iIncidentService.getReportList(sessionUser.getId(), pageNum, pageSize);
     }
 
+    @RequestMapping(value = "search.do")
+    public ServerResponse getReportList(String title,
+                                        @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+                                        @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
+        return iIncidentService.getIncidentListByTitle(title, pageNum, pageSize);
+    }
+
 }

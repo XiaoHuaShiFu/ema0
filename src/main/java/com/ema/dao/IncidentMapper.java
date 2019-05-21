@@ -39,4 +39,6 @@ public interface IncidentMapper {
     List<Incident> selectByUserId(Integer userId);
 
     List<Incident> selectByUserId0(Integer userId);
+
+    List<Incident> selectListByTitle(String title);
 }
