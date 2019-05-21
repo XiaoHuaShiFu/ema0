@@ -21,21 +21,21 @@ public class Inform {
     @Autowired
     UserMapper userMapper;
 
-    @Pointcut("execution(* com.ema.service.impl.UserServiceImpl.follow(..))&& args(user,followederId,..)")
+    @Pointcut(value = "execution(* com.ema.service.impl.UserServiceImpl.follow(..))&& args(user,followederId,..)", argNames = "user,followederId")
     public void pointCutFollow(User user,Integer followederId){
     }
-    @Pointcut("execution(* com.ema.service.impl.IncidentServiceImpl.attentionIncident(..))&& args(userId,id,..)")
+    @Pointcut(value = "execution(* com.ema.service.impl.IncidentServiceImpl.attentionIncident(..))&& args(userId,id,..)", argNames = "userId,id")
     public void PointCutIncidentFollow(Integer userId, Integer id){
     }
-    @Pointcut("execution(* com.ema.service.impl.IncidentCommentServiceImpl.saveComment(..))&& args(incidentComment,sessionUser,..)")
+    @Pointcut(value = "execution(* com.ema.service.impl.IncidentCommentServiceImpl.saveComment(..))&& args(incidentComment,sessionUser,..)", argNames = "incidentComment,sessionUser")
     public void pointCutComment(IncidentComment incidentComment, User sessionUser){
     }
-    @Pointcut("execution(* com.ema.service.impl.IncidentScndCommentServiceImpl.saveComment(..))&& args(incidentScndComment,sessionUser,..)")
+    @Pointcut(value = "execution(* com.ema.service.impl.IncidentScndCommentServiceImpl.saveComment(..))&& args(incidentScndComment,sessionUser,..)", argNames = "incidentScndComment,sessionUser")
     public void pointCutScndComment(IncidentScndComment incidentScndComment, User sessionUser){
     }
 
     //关注用户后
-    @AfterReturning(value = "pointCutFollow(user,followederId)",returning = "args")
+    @AfterReturning(value = "pointCutFollow(user,followederId)",returning = "args", argNames = "user,followederId,args")
     public void afterFollow(User user,Integer followederId,Object args) {
         ServerResponse returning = (ServerResponse) args;
         short type = 10;
@@ -60,19 +60,14 @@ public class Inform {
                 userNoticeMapper.insert(userNotice);
             }
         }
-        else
-            return;
     }
 
     //关注事件后
-    @AfterReturning(value = "PointCutIncidentFollow(userId,id)",returning = "args")
+    @AfterReturning(value = "PointCutIncidentFollow(userId,id)",returning = "args", argNames = "userId,id,args")
     public void afterIncidentFollow(Integer userId, Integer id,Object args){
         ServerResponse retuning = (ServerResponse) args;
         short type = 20;
-        if(retuning.getData() =="attention false"){
-            return;
-        }
-        else{
+        if(retuning.getData() !="attention false"){
             //userId关注事件的用户  id事件的ID
             UserNotice userNotice = new UserNotice();
             //设置为未看
@@ -100,7 +95,7 @@ public class Inform {
     }
 
     //评论事件后
-    @AfterReturning(value = "pointCutComment(incidentComment,sessionUser)",returning = "args")
+    @AfterReturning(value = "pointCutComment(incidentComment,sessionUser)",returning = "args", argNames = "incidentComment,sessionUser,args")
     public void afterComment(IncidentComment incidentComment,User sessionUser,Object args){
         ServerResponse returning = (ServerResponse) args;
         System.out.println(returning.getMsg());
@@ -123,12 +118,10 @@ public class Inform {
             userNotice.setContent(incidentComment.getComment());
             userNoticeMapper.insert(userNotice);
         }
-        else
-            return;
     }
 
     //二级评论后
-    @AfterReturning(value = "pointCutScndComment(incidentScndComment,sessionUser)",returning = "args")
+    @AfterReturning(value = "pointCutScndComment(incidentScndComment,sessionUser)",returning = "args", argNames = "incidentScndComment,sessionUser,args")
     public void afterScndComment(IncidentScndComment incidentScndComment, User sessionUser, Object args){
         ServerResponse returning = (ServerResponse) args;
         short type = 22;
@@ -148,7 +141,5 @@ public class Inform {
             userNotice.setContent(sessionUser.getNickName()+"回复了你:"+incidentScndComment.getComment());
             userNoticeMapper.insert(userNotice);
         }
-        else
-            return;
     }
 }
