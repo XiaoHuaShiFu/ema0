@@ -4,23 +4,37 @@ import com.ema.common.ResponseCode;
 import com.ema.common.ServerResponse;
 import com.ema.dao.UserFollowMapper;
 import com.ema.dao.UserMapper;
+import com.ema.dao.UserNoticeMapper;
 import com.ema.pojo.User;
 import com.ema.pojo.UserFollow;
+import com.ema.pojo.UserNotice;
 import com.ema.pojo.WechatBody;
 import com.ema.service.IFileService;
 import com.ema.service.IUserService;
+import com.ema.util.DateTimeUtil;
 import com.ema.util.PropertiesUtil;
+import com.ema.vo.UserNoticeVo;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
+import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -50,6 +64,9 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private IFileService iFileService;
+
+    @Autowired
+    private UserNoticeMapper userNoticeMapper;
 
     /**
      * 用户登录
@@ -211,36 +228,38 @@ public class UserServiceImpl implements IUserService {
             return ServerResponse.createByErrorMessage("followeder not exist");
         }
 
-        //查找数据库里是否有关注双方的id对
-        rowCount = userFollowMapper.selectCountByFollowederIdAndFollowerId(userFollow);
-        //小于1表明未关注，进行关注操作
-        // TODO: 2019/4/3 由于对事务不熟悉，这块就先不完善
-        if (rowCount < 1) {
-            // TODO: 2019/4/3 这里应该是通过事务管理确保数据完整性
-            // TODO: 2019/4/3 且这个模块应该是对于这个用户对是原子的
-            //保存关注双方的用户id对
-            userFollowMapper.insert(userFollow);
-            //被关注者的粉丝数+1
-            userMapper.updateByIdIncrFollowers(userFollow.getFollowederId());
-            //关注者的关注数+1
-            userMapper.updateByIdIncrFollowings(userFollow.getFollowerId());
-            //关注成功
-            return ServerResponse.createBySuccess("follow success");
-        }
-        //否则表明已经关注，进行取关操作
-        else {
-            // TODO: 2019/4/3 这里应该是通过事务管理确保数据完整性
-            // TODO: 2019/4/3 且这个模块应该是对于这个用户对是原子的
-            //删除关注双方的用户id对
-            userFollowMapper.deleteByFollowederIdAndFollowerId(userFollow);
-            //被关注者的粉丝数-1
-            userMapper.updateByIdDecrFollowers(userFollow.getFollowederId());
-            //关注者的关注数-1
-            userMapper.updateByIdDecrFollowings(userFollow.getFollowerId());
-            //取消关注成功
-            return ServerResponse.createBySuccess("unfollow success");
-        }
+//        //查找数据库里是否有关注双方的id对
+//        rowCount = userFollowMapper.selectCountByFollowederIdAndFollowerId(userFollow);
+//        //小于1表明未关注，进行关注操作
+//        // TODO: 2019/4/3 由于对事务不熟悉，这块就先不完善
+//        if (rowCount < 1) {
+//            // TODO: 2019/4/3 这里应该是通过事务管理确保数据完整性
+//            // TODO: 2019/4/3 且这个模块应该是对于这个用户对是原子的
+//            //保存关注双方的用户id对
+//            userFollowMapper.insert(userFollow);
+//            //被关注者的粉丝数+1
+//            userMapper.updateByIdIncrFollowers(userFollow.getFollowederId());
+//            //关注者的关注数+1
+//            userMapper.updateByIdIncrFollowings(userFollow.getFollowerId());
+//            //关注成功
+//            return ServerResponse.createBySuccess("follow success");
+//        }
+//        //否则表明已经关注，进行取关操作
+//        else {
+//            // TODO: 2019/4/3 这里应该是通过事务管理确保数据完整性
+//            // TODO: 2019/4/3 且这个模块应该是对于这个用户对是原子的
+//            //删除关注双方的用户id对
+//            userFollowMapper.deleteByFollowederIdAndFollowerId(userFollow);
+//            //被关注者的粉丝数-1
+//            userMapper.updateByIdDecrFollowers(userFollow.getFollowederId());
+//            //关注者的关注数-1
+//            userMapper.updateByIdDecrFollowings(userFollow.getFollowerId());
+//            //取消关注成功
+//            return ServerResponse.createBySuccess("unfollow success");
+//        }
+        return null;
     }
+
 
     /**
      * 删除用户的旧头像
@@ -297,4 +316,244 @@ public class UserServiceImpl implements IUserService {
         return user;
     }
 
+    //关注用户
+    public ServerResponse follow(User user, Integer followederId){
+
+        //从上面copy的
+        //发出此动作的用户一定是关注者
+        //所以此用户的id应该等于关注者id
+        //否则返回越权操作错误
+        if (user.getId() == null || user.getId().equals(followederId)) {
+            return ServerResponse.create(
+                    ResponseCode.UNAUTHORIZED_OPERATION.getCode(), ResponseCode.UNAUTHORIZED_OPERATION.getDesc());
+        }
+
+        //检查被关注者是否存在数据库里
+        int rowCount = userMapper.selectCountById(followederId);
+        //被关注者不存在
+        if(rowCount < 1) {
+            return ServerResponse.createByErrorMessage("followeder not exist");
+        }
+
+        UserFollow userFollow = new UserFollow();
+        userFollow.setFollowederId(followederId);//被关注人的id
+        userFollow.setFollowerId(user.getId());//关注人的id
+
+        //查找数据库里是否有关注双方的id对
+        int rowCount2 = userFollowMapper.selectCountByFollowederIdAndFollowerId(userFollow);
+        //小于1表明未关注，进行关注操作
+        // TODO: 2019/4/3 由于对事务不熟悉，这块就先不完善
+        if (rowCount2 < 1) {
+            // TODO: 2019/4/3 这里应该是通过事务管理确保数据完整性
+            // TODO: 2019/4/3 且这个模块应该是对于这个用户对是原子的
+            //保存关注双方的用户id对
+            userFollowMapper.insert(userFollow);
+            //被关注者的粉丝数+1
+            userMapper.updateByIdIncrFollowers(userFollow.getFollowederId());
+            //关注者的关注数+1
+            userMapper.updateByIdIncrFollowings(userFollow.getFollowerId());
+            //关注成功
+            return ServerResponse.createBySuccess("follow success");
+        }
+        //否则表明已经关注，进行取关操作
+        else {
+            // TODO: 2019/4/3 这里应该是通过事务管理确保数据完整性
+            // TODO: 2019/4/3 且这个模块应该是对于这个用户对是原子的
+            //删除关注双方的用户id对
+            userFollowMapper.deleteByFollowederIdAndFollowerId(userFollow);
+            //被关注者的粉丝数-1
+            userMapper.updateByIdDecrFollowers(userFollow.getFollowederId());
+            //关注者的关注数-1
+            userMapper.updateByIdDecrFollowings(userFollow.getFollowerId());
+            //取消关注成功
+            return ServerResponse.createBySuccess("unfollow success");
+        }
+    }
+
+
+    /**
+     * 获取用户新通知的事件列表
+     *
+     * @param user 发出请求的用户
+     * @param pageNum 页码
+     * @param pageSize 页条数
+     * @return 用户关注的事件列表
+     */
+    public ServerResponse NewInform(User user, int pageNum, int pageSize){
+        //发出此动作的一定是登陆的用户
+        //否则越权操作
+        if (user.getId() == null) {
+            return ServerResponse.create(
+                    ResponseCode.UNAUTHORIZED_OPERATION.getCode(), ResponseCode.UNAUTHORIZED_OPERATION.getDesc());
+        }
+        PageInfo<UserNoticeVo> Newmasg = new PageInfo<>(
+                getUserNewNoticeVoList(user, pageNum, pageSize));
+        return ServerResponse.createBySuccess(Newmasg);
+    }
+
+    private List<UserNoticeVo> getUserNewNoticeVoList(User user, int pageNum, int pageSize){
+        PageHelper.startPage(pageNum, pageSize);
+        List<UserNoticeVo> UserNewNoticeVoList = new ArrayList<>();
+        UserNotice userNotice = new UserNotice();
+        userNotice.setUserId(user.getId());
+        userNotice.setView(0);
+        if (userNoticeMapper.selectCountByViewAndUserId(userNotice) != null &&userNoticeMapper.selectCountByViewAndUserId(userNotice).size() != 0) {
+            List<UserNotice> NewmasgList = userNoticeMapper.selectCountByViewAndUserId(userNotice);
+            for (UserNotice i : NewmasgList){
+                UserNewNoticeVoList.add(assembleUserNoticeVo(i));
+            }
+            userNotice.setView(1);
+            //用户查看了消息，将View字段更新为1 （用户id，view为0并且信息相同的）
+            for (int i = 0; i < NewmasgList.size(); i++) {
+                UserNotice massage = NewmasgList.get(i);
+                userNotice.setContent(massage.getContent());
+                userNoticeMapper.updateByUser_id(userNotice);
+            }
+            return UserNewNoticeVoList;
+        }
+        else {
+            return null;
+        }
+    }
+
+        /**
+     * 获取用户所有通知的事件列表
+     *
+     * @param user 发出请求的用户
+     * @param pageNum 页码
+     * @param pageSize 页条数
+     * @return 用户关注的事件列表
+     */
+    public ServerResponse AllInform(User user, int pageNum, int pageSize) {
+        PageInfo<UserNoticeVo> result = new PageInfo<>(getUserNoticeVoList(user, pageNum, pageSize));
+        return ServerResponse.createBySuccess(result);
+    }
+
+    private List<UserNoticeVo> getUserNoticeVoList(User user, int pageNum, int pageSize){
+        PageHelper.startPage(pageNum, pageSize);
+        List<UserNoticeVo> UserNoticeVoList = new ArrayList<>();
+        if (userNoticeMapper.selectCountByUserId(user.getId()) != null && userNoticeMapper.selectCountByUserId(user.getId()).size() != 0){
+            List<UserNotice> userNoticeList = userNoticeMapper.selectCountByUserId(user.getId());
+            for (UserNotice i : userNoticeList){
+                UserNoticeVoList.add(assembleUserNoticeVo(i));
+            }
+            return UserNoticeVoList;
+        }
+        else
+            return null;
+    }
+
+    /**
+     * 装配UserNoticeVo
+     *
+     * @param userNotice
+     * @return
+     */
+    private UserNoticeVo assembleUserNoticeVo(UserNotice userNotice){
+        UserNoticeVo userNoticeVo = new UserNoticeVo();
+        userNoticeVo.setCommenterId(userNotice.getCommenterId());
+        userNoticeVo.setContent(userNotice.getContent());
+        userNoticeVo.setCreateTime(DateTimeUtil.dateToStr(userNotice.getCreateTime()));
+        userNoticeVo.setFollowerId(userNotice.getFollowerId());
+        userNoticeVo.setId(userNotice.getId());
+        userNoticeVo.setIncidentId(userNotice.getIncidentId());
+        userNoticeVo.setIncidentScndCommentId(userNotice.getIncidentScndCommentId());
+        userNoticeVo.setNoticeTime(DateTimeUtil.dateToStr(userNotice.getNoticeTime()));
+        userNoticeVo.setTitle(userNotice.getTitle());
+        userNoticeVo.setType(userNotice.getType());
+        userNoticeVo.setUpdateTime(DateTimeUtil.dateToStr(userNotice.getUpdateTime()));
+        userNoticeVo.setUserId(userNotice.getUserId());
+        userNoticeVo.setView(userNotice.getView());
+        return userNoticeVo;
+    }
 }
+//
+//public ServerResponse getViewList(Integer userId, int pageNum, int pageSize) {
+//    PageInfo<IncidentViewVo> result = new PageInfo<>(getIncidentViewVoList(userId, pageNum, pageSize));
+//    return ServerResponse.createBySuccess(result);
+//}
+//
+//private List<IncidentViewVo> getIncidentViewVoList(Integer userId, int pageNum, int pageSize) {
+//    PageHelper.startPage(pageNum, pageSize);
+//    List<IncidentView> incidentViewList = incidentViewMapper.selectByUserId(userId);
+//    if (incidentViewList == null) {
+//        return null;
+//    }
+//    List<IncidentViewVo> incidentViewVoList = new ArrayList<>();
+//    for (IncidentView i : incidentViewList) {
+//        Incident incident = incidentMapper.selectByPrimaryKey(i.getIncidentId());
+//        incidentViewVoList.add(assembleIncidentViewVo(i, incident));
+//    }
+//    return incidentViewVoList;
+//}
+//
+//    private IncidentVo assembleIncidentVo(Incident incident) {
+//        IncidentVo incidentVo = new IncidentVo();
+//        incidentVo.setId(incident.getId());
+//        incidentVo.setAnon(incident.getAnon());
+//        incidentVo.setViews(incident.getViews());
+//        incidentVo.setAttentions(incident.getAttentions());
+//        incidentVo.setComments(incident.getComments());
+//        incidentVo.setTitle(incident.getTitle());
+//        incidentVo.setOccurTime(DateTimeUtil.dateToStr(incident.getOccurTime()));
+//        incidentVo.setAddress(incident.getAddress());
+//        incidentVo.setAddressName(incident.getAddressName());
+//        incidentVo.setDescription(incident.getDescription());
+//        incidentVo.setMainImageUrl(incident.getMainImageUrl());
+//        incidentVo.setMainVideoUrl(incident.getMainVideoUrl());
+//        incidentVo.setLatitude(incident.getLatitude());
+//        incidentVo.setLongitude(incident.getLongitude());
+//        return incidentVo;
+//    }
+
+
+
+
+//    //新消息通知
+//    public ServerResponse Inform(User user){
+//        //发出此动作的一定是登陆的用户
+//        //否则越权操作
+//        if (user.getId() == null) {
+//            return ServerResponse.create(
+//                    ResponseCode.UNAUTHORIZED_OPERATION.getCode(), ResponseCode.UNAUTHORIZED_OPERATION.getDesc());
+//        }
+//        UserNotice userNotice = new UserNotice();
+//        userNotice.setUserId(user.getId());
+//        userNotice.setView(0);
+//        //用user的id去user_notice表中找到对应被通知用户的id，如果有，且消息没看，则返回消息内容
+//        if (userNoticeMapper.selectCountByViewAndUserId(userNotice) != null &&userNoticeMapper.selectCountByViewAndUserId(userNotice).size() != 0) {
+//                List<String> masg = userNoticeMapper.selectCountByViewAndUserId(userNotice);
+//                userNotice.setView(1);
+//                //用户查看了消息，将View字段更新为1
+//                for (int i = 0; i < masg.size(); i++) {
+//                    String massage = masg.get(i);
+//                    userNotice.setContent(massage);
+//                    userNoticeMapper.updateByUser_id(userNotice);
+//                }
+//                return ServerResponse.createBySuccess(masg);
+//        }
+//        else {
+//            return ServerResponse.createBySuccess("no message");
+//        }
+//    }
+
+
+//    //所有消息通知
+//    public ServerResponse AllInform(User user){
+//        //发出此动作的一定是登陆的用户
+//        //否则越权操作
+//        if (user.getId() == null) {
+//            return ServerResponse.create(
+//                    ResponseCode.UNAUTHORIZED_OPERATION.getCode(), ResponseCode.UNAUTHORIZED_OPERATION.getDesc());
+//        }
+//        UserNotice userNotice = new UserNotice();
+//        userNotice.setUserId(user.getId());
+//        //将有关此用户的消息全都显示出来
+//        if (userNoticeMapper.selectCountByUserId(userNotice) != null && userNoticeMapper.selectCountByUserId(userNotice).size() != 0){
+//            List<String> Allmasg = userNoticeMapper.selectCountByUserId(userNotice);
+//            return  ServerResponse.createBySuccess(Allmasg);
+//        }
+//        else
+//            return ServerResponse.createBySuccess("no Message");
+//    }
+

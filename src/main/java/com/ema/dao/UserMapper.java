@@ -48,4 +48,6 @@ public interface UserMapper {
     int incrCollections(Integer userId);
 
     int decrCollections(Integer userId);
+
+    String selectNickNameById(Integer userId);
 }

@@ -269,6 +269,13 @@
     WHERE id = #{incidentId}
   </select>
 
+  <select id="selectUserIdById" parameterType="integer" resultType="int">
+    SELECT
+    user_id
+    FROM incident
+    WHERE id = #{incidentId}
+  </select>
+
   <select id="selectByUserId" parameterType="integer" resultMap="BaseResultMap">
     SELECT
     <include refid="Base_Column_List"/>

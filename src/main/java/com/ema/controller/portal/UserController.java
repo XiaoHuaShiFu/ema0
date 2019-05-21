@@ -6,9 +6,13 @@ import com.ema.common.ServerResponse;
 import com.ema.pojo.User;
 import com.ema.pojo.UserFollow;
 import com.ema.service.IUserService;
+import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -165,16 +169,40 @@ public class UserController {
     }
 
 
-    // TODO: 2019/4/3 follow功能未完成
+
+    // TODO: 2019/4/3 follow功能
     @RequestMapping(value = "follow.do")
-    public ServerResponse follow(HttpSession session, UserFollow userFollow) {
+    public ServerResponse follow(HttpSession session, Integer followederId){
+
         User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
-        if (sessionUser == null) {
-            return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+        if(sessionUser == null){
+            return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
         }
-        return iUserService.follow(sessionUser, userFollow);
+        return iUserService.follow(sessionUser,followederId);
     }
 
 
-    // TODO: 2019/4/10 用户的通知模块未做
+    // TODO: 2019/4/20 用户的新通知通知模块
+    @RequestMapping(value = "NewInform.do")
+    public ServerResponse inform(HttpSession session,
+                                 @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+                                 @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
+        User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
+        if(sessionUser == null){
+            return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
+        }
+        return iUserService.NewInform(sessionUser,pageNum,pageSize);
+    }
+
+    // TODO: 2019/4/20 用户的所有通知通知模块
+    @RequestMapping(value = "AllInform.do")
+    public ServerResponse AllInform(HttpSession session,
+                                    @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+                                    @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
+        User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
+        if(sessionUser == null){
+            return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
+        }
+        return iUserService.AllInform(sessionUser,pageNum,pageSize);
+    }
 }

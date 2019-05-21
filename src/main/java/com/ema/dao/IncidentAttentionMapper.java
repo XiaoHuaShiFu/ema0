@@ -9,4 +9,5 @@ public interface IncidentAttentionMapper {
     int insert(@Param("userId") Integer userId, @Param("incidentId") Integer incidentId);
 
     int deleteByUserIdAndIncidentId(@Param("incidentId") Integer incidentId, @Param("userId") Integer userId);
+
 }
