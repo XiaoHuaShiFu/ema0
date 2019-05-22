@@ -512,7 +512,11 @@ public class IncidentServiceImpl implements IIncidentService{
         }
         List<IncidentVo> incidentVoList = new ArrayList<>();
         for (Incident i : incidentList) {
-            incidentVoList.add(assembleIncidentVo(i));
+            User user = userMapper.selectByPrimaryKey(i.getUserId());
+            UserVo userVo = assembleUserVo(user);
+            List<Tag> tagList = tagMapper.selectTagListByIncidentId(i.getId());
+            List<TagVo> tagVoList = assembleTagVoList(tagList);
+            incidentVoList.add(assembleIncidentVo(i, userVo, tagVoList));
         }
         return incidentVoList;
     }
@@ -523,7 +527,7 @@ public class IncidentServiceImpl implements IIncidentService{
      * @param incident
      * @return
      */
-    private IncidentVo assembleIncidentVo(Incident incident) {
+    private IncidentVo assembleIncidentVo(Incident incident, UserVo userVo, List<TagVo> tagVoList) {
         IncidentVo incidentVo = new IncidentVo();
         incidentVo.setId(incident.getId());
         incidentVo.setAnon(incident.getAnon());
@@ -539,6 +543,8 @@ public class IncidentServiceImpl implements IIncidentService{
         incidentVo.setMainVideoUrl(incident.getMainVideoUrl());
         incidentVo.setLatitude(incident.getLatitude());
         incidentVo.setLongitude(incident.getLongitude());
+        incidentVo.setUserVo(userVo);
+        incidentVo.setTagVoList(tagVoList);
         return incidentVo;
     }
 
