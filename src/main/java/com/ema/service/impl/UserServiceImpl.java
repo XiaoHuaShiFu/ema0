@@ -149,11 +149,13 @@ public class UserServiceImpl implements IUserService {
     @Override
     public ServerResponse updateInformation(User user) {
         User user0 = new User();
+        user0.setId(user.getId());
         user0.setPhone(user.getPhone());
         user0.setEmail(user.getEmail());
         user0.setNickName(user.getNickName());
         user0.setGender(user.getGender());
         user0.setAvatarUrl(user.getAvatarUrl());
+        System.out.println(user0);
         int updateCount = userMapper.updateByPrimaryKeySelective(user0);
         if (updateCount > 0) {
             return ServerResponse.createBySuccess("update user info success", getUser(user.getId()));
