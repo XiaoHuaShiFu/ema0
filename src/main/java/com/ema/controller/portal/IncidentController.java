@@ -58,8 +58,9 @@ public class IncidentController {
      * @return 返回事件详情列表
      */
     @RequestMapping(value = "get_incident.do")
-    public ServerResponse getIncident(int id) {
-        return iIncidentService.getIncident(id);
+    public ServerResponse getIncident(HttpSession session, Integer id) {
+        User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
+        return iIncidentService.getIncident(id, sessionUser == null ?  0 : sessionUser.getId());
     }
 
     /**
@@ -85,14 +86,17 @@ public class IncidentController {
      * 获取事件简略信息列表
      * 状态码0表示获取成功
      *
+     * @param session 会话
      * @param pageNum 页码
      * @param pageSize 页大小
      * @return 事件简略信息列表
      */
     @RequestMapping(value = "list.do")
-    public ServerResponse getIncidentList(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+    public ServerResponse getIncidentList(HttpSession session,
+                                          @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
                                           @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
-        return iIncidentService.getIncidentList(pageNum, pageSize);
+        User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
+        return iIncidentService.getIncidentList(pageNum, pageSize, sessionUser == null ?  0 : sessionUser.getId());
     }
 
     /**
@@ -261,11 +265,22 @@ public class IncidentController {
         return iIncidentService.getReportList(sessionUser.getId(), pageNum, pageSize);
     }
 
+    /**
+     * 通过标题搜索事件
+     * 如果返回状态码0表明搜索成功
+     *
+     * @param title 事件标题
+     * @param pageNum 页码
+     * @param pageSize 页条数
+     * @return 符合条件的搜索结果
+     */
     @RequestMapping(value = "search.do")
-    public ServerResponse getReportList(String title,
+    public ServerResponse getReportList(HttpSession session, String title,
                                         @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
                                         @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
-        return iIncidentService.getIncidentListByTitle(title, pageNum, pageSize);
+        User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
+        return iIncidentService.getIncidentListByTitle(
+                title, pageNum, pageSize, sessionUser == null ?  0 : sessionUser.getId());
     }
 
 }

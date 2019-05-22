@@ -17,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.View;
 
 import java.util.*;
 
@@ -48,6 +47,9 @@ public class IncidentServiceImpl implements IIncidentService{
 
     @Autowired
     private IncidentViewMapper incidentViewMapper;
+
+    @Autowired
+    private IncidentCommentMapper incidentCommentMapper;
 
     @Autowired
     private IIncidentCommentService iIncidentCommentService;
@@ -128,7 +130,7 @@ public class IncidentServiceImpl implements IIncidentService{
         incidentMapper.updateByPrimaryKeySelective(incident);
 
         //把更新后的事件返回出去
-        return ServerResponse.createBySuccess(getIncident(incident.getId()));
+        return ServerResponse.createBySuccess(getIncident(incident.getId(), sessionUser.getId()));
     }
 
     /**
@@ -137,7 +139,7 @@ public class IncidentServiceImpl implements IIncidentService{
      * @param id 事件id
      * @return
      */
-    public ServerResponse  getIncident(int id) {
+    public ServerResponse  getIncident(Integer id, Integer userId) {
         Incident incident = incidentMapper.selectByPrimaryKey(id);
         //事件不存在
         if (incident == null) {
@@ -146,8 +148,9 @@ public class IncidentServiceImpl implements IIncidentService{
         User user = userMapper.selectByPrimaryKey(incident.getUserId());
         List<Tag> tagList = tagMapper.selectTagListByIncidentId(incident.getId());
         List<IncidentCommentVo> incidentCommentVoList = iIncidentCommentService.getIncidentCommentVoList(id, 1, 10);
+        int isAttention = incidentAttentionMapper.selectCountByIncidentIdAndUserId(incident.getId(), userId);
         //装配事件详情Vo
-        IncidentVo incidentVo = assembleIncidentVo(incident, user, tagList, incidentCommentVoList);
+        IncidentVo incidentVo = assembleIncidentVo(incident, user, tagList, incidentCommentVoList, isAttention);
         return ServerResponse.createBySuccess(incidentVo);
     }
 
@@ -173,10 +176,11 @@ public class IncidentServiceImpl implements IIncidentService{
      *
      * @param pageNum 页码
      * @param pageSize 页条数
+     * @param userId 用户id
      * @return 事件简略信息列表
      */
-    public ServerResponse getIncidentList(int pageNum, int pageSize) {
-        PageInfo<IncidentVo> result = new PageInfo<>(getIncidentVoList(pageNum, pageSize));
+    public ServerResponse getIncidentList(int pageNum, int pageSize, Integer userId) {
+        PageInfo<IncidentVo> result = new PageInfo<>(getIncidentVoList(pageNum, pageSize, userId));
         return ServerResponse.createBySuccess(result);
     }
 
@@ -364,10 +368,10 @@ public class IncidentServiceImpl implements IIncidentService{
      * @param pageSize 页条数
      * @return 返回搜索的结果列表
      */
-    public ServerResponse getIncidentListByTitle(String title, int pageNum, int pageSize) {
+    public ServerResponse getIncidentListByTitle(String title, int pageNum, int pageSize, Integer userId) {
         PageHelper.startPage(pageNum, pageSize);
         List<Incident> incidentList = incidentMapper.selectListByTitle("%" + title + "%");
-        List<IncidentVo> incidentVoList = assembleIncidentVoList(incidentList);
+        List<IncidentVo> incidentVoList = assembleIncidentVoList(incidentList, userId);
         PageInfo<IncidentVo> result = new PageInfo<>(incidentVoList);
         return ServerResponse.createBySuccess(result);
     }
@@ -492,21 +496,23 @@ public class IncidentServiceImpl implements IIncidentService{
      *
      * @param pageNum 页码
      * @param pageSize 页条数
+     * @param userId
      * @return
      */
-    private List<IncidentVo> getIncidentVoList(int pageNum, int pageSize) {
+    private List<IncidentVo> getIncidentVoList(int pageNum, int pageSize, Integer userId) {
         PageHelper.startPage(pageNum, pageSize);
         List<Incident> incidentList =  incidentMapper.selectListOrderByTime();
-        return assembleIncidentVoList(incidentList);
+        return assembleIncidentVoList(incidentList, userId);
     }
 
     /**
      * 装配事件vo列表
      *
      * @param incidentList
+     * @param userId
      * @return
      */
-    private List<IncidentVo> assembleIncidentVoList(List<Incident> incidentList) {
+    private List<IncidentVo> assembleIncidentVoList(List<Incident> incidentList, Integer userId) {
         if (incidentList == null) {
             return null;
         }
@@ -516,7 +522,8 @@ public class IncidentServiceImpl implements IIncidentService{
             UserVo userVo = assembleUserVo(user);
             List<Tag> tagList = tagMapper.selectTagListByIncidentId(i.getId());
             List<TagVo> tagVoList = assembleTagVoList(tagList);
-            incidentVoList.add(assembleIncidentVo(i, userVo, tagVoList));
+            int isAttention = incidentAttentionMapper.selectCountByIncidentIdAndUserId(i.getId(), userId);
+            incidentVoList.add(assembleIncidentVo(i, userVo, tagVoList, isAttention));
         }
         return incidentVoList;
     }
@@ -525,14 +532,16 @@ public class IncidentServiceImpl implements IIncidentService{
      * 装配IncidentVo
      *
      * @param incident
+     * @param isAttention
      * @return
      */
-    private IncidentVo assembleIncidentVo(Incident incident, UserVo userVo, List<TagVo> tagVoList) {
+    private IncidentVo assembleIncidentVo(Incident incident, UserVo userVo, List<TagVo> tagVoList, int isAttention) {
         IncidentVo incidentVo = new IncidentVo();
         incidentVo.setId(incident.getId());
         incidentVo.setAnon(incident.getAnon());
         incidentVo.setViews(incident.getViews());
         incidentVo.setAttentions(incident.getAttentions());
+        incidentVo.setAttention(isAttention);
         incidentVo.setComments(incident.getComments());
         incidentVo.setTitle(incident.getTitle());
         incidentVo.setOccurTime(DateTimeUtil.dateToStr(incident.getOccurTime()));
@@ -555,17 +564,19 @@ public class IncidentServiceImpl implements IIncidentService{
      * @param user
      * @param tagList
      * @param incidentCommentVoList
+     * @param isAttention
      * @return
      */
     private IncidentVo assembleIncidentVo(
             Incident incident, User user, List<Tag> tagList,
-            List<IncidentCommentVo> incidentCommentVoList) {
+            List<IncidentCommentVo> incidentCommentVoList, int isAttention) {
         IncidentVo incidentVo = new IncidentVo();
         incidentVo.setId(incident.getId());
         incidentVo.setUserVo(assembleUserVo(user));
         incidentVo.setAnon(incident.getAnon());
         incidentVo.setViews(incident.getViews());
         incidentVo.setAttentions(incident.getAttentions());
+        incidentVo.setAttention(isAttention);
         incidentVo.setComments(incident.getComments());
         incidentVo.setTagVoList(assembleTagVoList(tagList));
         incidentVo.setTitle(incident.getTitle());

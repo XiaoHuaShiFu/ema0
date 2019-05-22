@@ -43,5 +43,11 @@
     AND incident_id = #{incidentId}
   </delete>
 
-
+  <select id="selectCountByIncidentIdAndUserId" parameterType="map" resultType="int">
+    SELECT
+    COUNT(1)
+    FROM incident_attention
+    WHERE user_id = #{userId}
+    AND incident_id = #{incidentId}
+  </select>
 </mapper>

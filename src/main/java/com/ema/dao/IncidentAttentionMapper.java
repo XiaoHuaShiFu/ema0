@@ -10,4 +10,5 @@ public interface IncidentAttentionMapper {
 
     int deleteByUserIdAndIncidentId(@Param("incidentId") Integer incidentId, @Param("userId") Integer userId);
 
+    int selectCountByIncidentIdAndUserId(@Param("incidentId") Integer incidentId, @Param("userId") Integer userId);
 }

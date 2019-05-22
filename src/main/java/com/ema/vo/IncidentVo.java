@@ -13,6 +13,8 @@ public class IncidentVo {
 
     private Integer attentions;
 
+    private Integer attention;
+
     private Integer comments;
 
     private List<TagVo> tagVoList;
@@ -75,6 +77,14 @@ public class IncidentVo {
 
     public void setAttentions(Integer attentions) {
         this.attentions = attentions;
+    }
+
+    public Integer getAttention() {
+        return attention;
+    }
+
+    public void setAttention(Integer attention) {
+        this.attention = attention;
     }
 
     public Integer getComments() {
@@ -172,4 +182,5 @@ public class IncidentVo {
     public void setIncidentCommentVoList(List<IncidentCommentVo> incidentCommentVoList) {
         this.incidentCommentVoList = incidentCommentVoList;
     }
+
 }

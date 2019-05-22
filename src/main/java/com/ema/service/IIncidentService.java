@@ -15,11 +15,11 @@ import org.springframework.web.multipart.MultipartFile;
 public interface IIncidentService {
     ServerResponse saveIncident(Incident incident, User user, int[] tags);
 
-    ServerResponse getIncident(int id);
+    ServerResponse getIncident(Integer id, Integer userId);
 
     ServerResponse deleteIncident(User sessionUser, Incident id);
 
-    ServerResponse getIncidentList(int pageNum, int pageSize);
+    ServerResponse getIncidentList(int pageNum, int pageSize, Integer userId);
 
     ServerResponse uploadMainImage(String path, MultipartFile mainImage, Integer userId, Integer incidentId);
 
@@ -37,5 +37,5 @@ public interface IIncidentService {
 
     ServerResponse getReportList(Integer userId, int pageNum, int pageSize);
 
-    ServerResponse getIncidentListByTitle(String title, int pageNum, int pageSize);
+    ServerResponse getIncidentListByTitle(String title, int pageNum, int pageSize, Integer userId);
 }
