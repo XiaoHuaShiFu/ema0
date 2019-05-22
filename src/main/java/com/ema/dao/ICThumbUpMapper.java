@@ -9,4 +9,6 @@ public interface ICThumbUpMapper {
     int insertSelective(ICThumbUp record);
 
     int deleteByUserIdAndICId(@Param("icId") Integer icId, @Param("userId") Integer userId);
+
+    int selectCountByIncidentCommentIdAndUserId(@Param("icId") Integer icId, @Param("userId") Integer userId);
 }

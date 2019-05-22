@@ -17,7 +17,11 @@ public class IncidentCommentVo {
 
     private Integer collections;
 
+    private Integer collection;
+
     private Integer thumbUps;
+
+    private Integer thumbUp;
 
     private String commentTime;
 
@@ -81,12 +85,28 @@ public class IncidentCommentVo {
         this.collections = collections;
     }
 
+    public Integer getCollection() {
+        return collection;
+    }
+
+    public void setCollection(Integer collection) {
+        this.collection = collection;
+    }
+
     public Integer getThumbUps() {
         return thumbUps;
     }
 
     public void setThumbUps(Integer thumbUps) {
         this.thumbUps = thumbUps;
+    }
+
+    public Integer getThumbUp() {
+        return thumbUp;
+    }
+
+    public void setThumbUp(Integer thumbUp) {
+        this.thumbUp = thumbUp;
     }
 
     public String getCommentTime() {

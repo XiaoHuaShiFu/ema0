@@ -9,4 +9,6 @@ public interface IncidentCommentCollectionMapper {
     int insertSelective(IncidentCommentCollection record);
 
     int deleteByUserIdAndCommentId(@Param("commentId") Integer commentId, @Param("userId") Integer userId);
+
+    int selectCountByIncidentCommentIdAndUserId(@Param("incidentCommentId") Integer incidentCommentId, @Param("userId") Integer userId);
 }

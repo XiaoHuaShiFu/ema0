@@ -54,6 +54,7 @@ public class IncidentController {
      * 状态码0表示获取成功
      * 状态码1表示获取失败
      *
+     * @param session 会话
      * @param id 事件id
      * @return 返回事件详情列表
      */

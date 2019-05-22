@@ -39,4 +39,13 @@
     WHERE user_id = #{userId}
     AND incident_comment_id = #{commentId}
   </delete>
+
+  <select id="selectCountByIncidentCommentIdAndUserId" parameterType="map" resultType="int">
+    SELECT
+    COUNT(1)
+    FROM incident_comment_collection
+    WHERE user_id = #{userId}
+    AND incident_comment_id = #{incidentCommentId}
+  </select>
+
 </mapper>

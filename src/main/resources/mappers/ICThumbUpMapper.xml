@@ -53,4 +53,12 @@
     WHERE u_id = #{userId}
     AND ic_id = #{icId}
   </delete>
+
+  <select id="selectCountByIncidentCommentIdAndUserId" parameterType="map" resultType="int">
+    SELECT
+    COUNT(1)
+    FROM ic_thumb_up
+    WHERE u_id = #{userId}
+    AND ic_id = #{icId}
+  </select>
 </mapper>

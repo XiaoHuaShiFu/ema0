@@ -98,8 +98,13 @@ public class IncidentCommentServiceImpl implements IIncidentCommentService{
         }
         User user = userMapper.selectByPrimaryKey(incidentComment.getUserId());
         IncidentCommentVo incidentCommentVo = assembleIncidentCommentVo(incidentComment, user);
+        int isCollection = incidentCommentCollectionMapper.selectCountByIncidentCommentIdAndUserId(incidentComment.getId(), sessionUser.getId());
+        int isThumbUp = icThumbUpMapper.selectCountByIncidentCommentIdAndUserId(incidentComment.getId(), sessionUser.getId());
+
         incidentCommentVo.setIncidentScndCommentVoList(
                 iIncidentScndCommentService.getIncidentScndCommentVoList(sessionUser, 1, 2, id));
+        incidentCommentVo.setCollection(isCollection);
+        incidentCommentVo.setThumbUp(isThumbUp);
         return ServerResponse.createBySuccess(incidentCommentVo);
     }
 
