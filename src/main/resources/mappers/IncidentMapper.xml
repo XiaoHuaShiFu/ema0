@@ -216,7 +216,7 @@
     SELECT
     <include refid="Base_Column_List"/>
     FROM incident
-    ORDER BY occur_time
+    ORDER BY create_time DESC
   </select>
 
   <select id="selectCountByUserIdAndId" parameterType="map" resultType="int">
