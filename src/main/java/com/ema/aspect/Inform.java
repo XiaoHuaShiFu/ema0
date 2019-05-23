@@ -113,7 +113,7 @@ public class Inform {
             //根据评论事件的id找到事件的标题
             String title = incidentMapper.selectTitleById(incidentComment.getIncidentId());
             //设置通知标题
-            userNotice.setTitle(sessionUser.getNickName() + "，评论了你的事件，" + title);
+            userNotice.setTitle(sessionUser.getNickName() + "，评论了你的事件：" + incidentComment.getComment());
             //设置通知内容
             userNotice.setContent(incidentComment.getComment());
             userNoticeMapper.insert(userNotice);
