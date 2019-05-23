@@ -22,27 +22,24 @@ public class Inform {
     UserMapper userMapper;
 
     @Pointcut(value = "execution(* com.ema.service.impl.UserServiceImpl.follow(..))&& args(user,followederId,..)", argNames = "user,followederId")
-    public void pointCutFollow(User user, Integer followederId) {
+    public void pointCutFollow(User user,Integer followederId){
     }
-
     @Pointcut(value = "execution(* com.ema.service.impl.IncidentServiceImpl.attentionIncident(..))&& args(userId,id,..)", argNames = "userId,id")
-    public void PointCutIncidentFollow(Integer userId, Integer id) {
+    public void PointCutIncidentFollow(Integer userId, Integer id){
     }
-
     @Pointcut(value = "execution(* com.ema.service.impl.IncidentCommentServiceImpl.saveComment(..))&& args(incidentComment,sessionUser,..)", argNames = "incidentComment,sessionUser")
-    public void pointCutComment(IncidentComment incidentComment, User sessionUser) {
+    public void pointCutComment(IncidentComment incidentComment, User sessionUser){
     }
-
     @Pointcut(value = "execution(* com.ema.service.impl.IncidentScndCommentServiceImpl.saveComment(..))&& args(incidentScndComment,sessionUser,..)", argNames = "incidentScndComment,sessionUser")
-    public void pointCutScndComment(IncidentScndComment incidentScndComment, User sessionUser) {
+    public void pointCutScndComment(IncidentScndComment incidentScndComment, User sessionUser){
     }
 
     //关注用户后
-    @AfterReturning(value = "pointCutFollow(user,followederId)", returning = "args", argNames = "user,followederId,args")
-    public void afterFollow(User user, Integer followederId, Object args) {
+    @AfterReturning(value = "pointCutFollow(user,followederId)",returning = "args", argNames = "user,followederId,args")
+    public void afterFollow(User user,Integer followederId,Object args) {
         ServerResponse returning = (ServerResponse) args;
         short type = 10;
-        if (returning.getData() == "follow success") {
+        if (returning.getData() == "follow success"){
             //user关注者，followederId被关注者
             UserNotice userNotice = new UserNotice();
             //设置被关注者的id
@@ -59,18 +56,18 @@ public class Inform {
             userNotice.setContent(user.getNickName() + " 关注了你");
             //关注后判断一下通知里是否已经存在这个消息，如果存在且通知没被看就不往里面添加了
             int count = userNoticeMapper.selectViewOrNot(userNotice);
-            if (count < 1) {
+            if(count < 1){
                 userNoticeMapper.insert(userNotice);
             }
         }
     }
 
     //关注事件后
-    @AfterReturning(value = "PointCutIncidentFollow(userId,id)", returning = "args", argNames = "userId,id,args")
-    public void afterIncidentFollow(Integer userId, Integer id, Object args) {
+    @AfterReturning(value = "PointCutIncidentFollow(userId,id)",returning = "args", argNames = "userId,id,args")
+    public void afterIncidentFollow(Integer userId, Integer id,Object args){
         ServerResponse retuning = (ServerResponse) args;
         short type = 20;
-        if (retuning.getData() != "attention false") {
+        if(retuning.getData() !="attention false"){
             //userId关注事件的用户  id事件的ID
             UserNotice userNotice = new UserNotice();
             //设置为未看
@@ -91,19 +88,19 @@ public class Inform {
             userNotice.setContent(user_nickName + "，关注了你的事件，" + title);
             //关注后判断一下通知里是否已经存在这个消息，如果存在且通知没被看就不往里面添加了
             int count = userNoticeMapper.selectViewOrNot(userNotice);
-            if (count < 1) {
+            if(count < 1){
                 userNoticeMapper.insert(userNotice);
             }
         }
     }
 
     //评论事件后
-    @AfterReturning(value = "pointCutComment(incidentComment,sessionUser)", returning = "args", argNames = "incidentComment,sessionUser,args")
-    public void afterComment(IncidentComment incidentComment, User sessionUser, Object args) {
+    @AfterReturning(value = "pointCutComment(incidentComment,sessionUser)",returning = "args", argNames = "incidentComment,sessionUser,args")
+    public void afterComment(IncidentComment incidentComment,User sessionUser,Object args){
         ServerResponse returning = (ServerResponse) args;
         System.out.println(returning.getMsg());
         short type = 21;
-        if (returning.getMsg() != null && returning.getMsg().equals("upload comment success")) {
+        if (returning.getMsg() == "upload comment success"){
             //incidentComment事件评论的详细信息 seesionUser评论者的信息
             UserNotice userNotice = new UserNotice();
             //设置为未看
@@ -124,11 +121,11 @@ public class Inform {
     }
 
     //二级评论后
-    @AfterReturning(value = "pointCutScndComment(incidentScndComment,sessionUser)", returning = "args", argNames = "incidentScndComment,sessionUser,args")
-    public void afterScndComment(IncidentScndComment incidentScndComment, User sessionUser, Object args) {
+    @AfterReturning(value = "pointCutScndComment(incidentScndComment,sessionUser)",returning = "args", argNames = "incidentScndComment,sessionUser,args")
+    public void afterScndComment(IncidentScndComment incidentScndComment, User sessionUser, Object args){
         ServerResponse returning = (ServerResponse) args;
         short type = 22;
-        if (returning.getMsg() != null && returning.getMsg().equals("save comment success")) {
+        if (returning.getMsg() == "save comment success"){
             UserNotice userNotice = new UserNotice();
             //设置消息为未看
             userNotice.setView(0);
@@ -141,7 +138,7 @@ public class Inform {
             //设置二级评论者的id
             userNotice.setIncidentScndCommentId(sessionUser.getId());
             //设置通知内容
-            userNotice.setContent(sessionUser.getNickName() + "，回复了你：" + incidentScndComment.getComment());
+            userNotice.setContent(sessionUser.getNickName() + "，回复了你："+incidentScndComment.getComment());
             userNoticeMapper.insert(userNotice);
         }
     }
