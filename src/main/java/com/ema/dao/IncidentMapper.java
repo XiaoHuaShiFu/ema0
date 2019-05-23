@@ -22,7 +22,7 @@ public interface IncidentMapper {
 
     int decrComments(Integer incidentId);
 
-    int deleteByIdAndUserId(@Param("userId") Integer userId, @Param("id") Incident id);
+    int deleteByIdAndUserId(@Param("userId") Integer userId, @Param("id") Integer id);
 
     List<Incident> selectListOrderByTime();
 

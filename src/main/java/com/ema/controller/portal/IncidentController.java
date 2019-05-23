@@ -75,7 +75,7 @@ public class IncidentController {
      * @return 带状态码的响应信息
      */
     @RequestMapping(value = "delete.do")
-    public ServerResponse delete(HttpSession session, Incident id) {
+    public ServerResponse delete(HttpSession session, Integer id) {
         User sessionUser = (User) session.getAttribute(Const.LOGINING_USER);
         if (sessionUser == null) {
             return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());

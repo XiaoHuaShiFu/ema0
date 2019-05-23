@@ -18,7 +18,7 @@
     <!--扫描com.ema包下面的文件-->
     <context:component-scan base-package="com.ema" annotation-config="true"/>
     <!--<context:annotation-config/>-->
-    <aop:aspectj-autoproxy expose-proxy="true"></aop:aspectj-autoproxy>
+    <aop:aspectj-autoproxy expose-proxy="true"/>
 
     <!--把这个文件的参量分离到classpath:datasource.properties-->
     <bean id="propertyConfigurer"
@@ -70,7 +70,7 @@
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/><!--注入dataSource-->
         <!--指定到resources文件夹（classpath）下面的mappers/*mapper.xml-->
-        <property name="mapperLocations" value="classpath*:mappers/*Mapper.xml"></property>
+        <property name="mapperLocations" value="classpath*:mappers/*Mapper.xml"/>
 
         <!-- 分页插件 -->
         <property name="plugins">

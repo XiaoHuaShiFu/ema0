@@ -17,7 +17,7 @@ public interface IIncidentService {
 
     ServerResponse getIncident(Integer id, Integer userId);
 
-    ServerResponse deleteIncident(User sessionUser, Incident id);
+    ServerResponse deleteIncident(User sessionUser, Integer id);
 
     ServerResponse getIncidentList(int pageNum, int pageSize, Integer userId);
 

@@ -49,9 +49,6 @@ public class IncidentServiceImpl implements IIncidentService{
     private IncidentViewMapper incidentViewMapper;
 
     @Autowired
-    private IncidentCommentMapper incidentCommentMapper;
-
-    @Autowired
     private IIncidentCommentService iIncidentCommentService;
 
     @Autowired
@@ -161,7 +158,9 @@ public class IncidentServiceImpl implements IIncidentService{
      * @param id 事件id
      * @return 带状态码的响应信息
      */
-    public ServerResponse deleteIncident(User sessionUser, Incident id) {
+    public ServerResponse deleteIncident(User sessionUser, Integer id) {
+        System.out.println(sessionUser.getId());
+        System.out.println(id);
         int rowCount = incidentMapper.deleteByIdAndUserId(sessionUser.getId(), id);
         //删除失败，可能因为用户越权等
         if (rowCount < 1) {
