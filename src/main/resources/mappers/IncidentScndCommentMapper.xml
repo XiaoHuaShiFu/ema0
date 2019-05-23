@@ -168,4 +168,11 @@
     )
   </update>
 
+
+  <select id="selectUserIdById" parameterType="integer" resultType="integer">
+    SELECT
+    user_id
+    FROM incident_scnd_comment
+    WHERE id = #{parScndCommentId}
+  </select>
 </mapper>

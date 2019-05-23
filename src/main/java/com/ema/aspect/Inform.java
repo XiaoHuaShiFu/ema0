@@ -1,9 +1,7 @@
 package com.ema.aspect;
 
 import com.ema.common.ServerResponse;
-import com.ema.dao.IncidentMapper;
-import com.ema.dao.UserMapper;
-import com.ema.dao.UserNoticeMapper;
+import com.ema.dao.*;
 import com.ema.pojo.*;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -15,11 +13,20 @@ import org.springframework.stereotype.Service;
 @Aspect
 public class Inform {
     @Autowired
-    UserNoticeMapper userNoticeMapper;
+    private UserNoticeMapper userNoticeMapper;
+
     @Autowired
-    IncidentMapper incidentMapper;
+    private IncidentMapper incidentMapper;
+
     @Autowired
-    UserMapper userMapper;
+    private UserMapper userMapper;
+
+    @Autowired
+    private IncidentScndCommentMapper incidentScndCommentMapper;
+
+    @Autowired
+    private IncidentCommentMapper incidentCommentMapper;
+
 
     @Pointcut(value = "execution(* com.ema.service.impl.UserServiceImpl.follow(..))&& args(user,followederId,..)", argNames = "user,followederId")
     public void pointCutFollow(User user,Integer followederId){
@@ -53,7 +60,7 @@ public class Inform {
             //设置通知类型
             userNotice.setType(type);
             //设置通知内容
-            userNotice.setContent(user.getNickName() + " 关注了你");
+            userNotice.setContent(user.getNickName() + "，关注了你");
             //关注后判断一下通知里是否已经存在这个消息，如果存在且通知没被看就不往里面添加了
             int count = userNoticeMapper.selectViewOrNot(userNotice);
             if(count < 1){
@@ -64,7 +71,7 @@ public class Inform {
 
     //关注事件后
     @AfterReturning(value = "PointCutIncidentFollow(userId,id)",returning = "args", argNames = "userId,id,args")
-    public void afterIncidentFollow(Integer userId, Integer id,Object args){
+    public void afterIncidentFollow(Integer userId, Integer id, Object args){
         ServerResponse retuning = (ServerResponse) args;
         short type = 20;
         if(retuning.getData() !="attention false"){
@@ -89,6 +96,8 @@ public class Inform {
             //关注后判断一下通知里是否已经存在这个消息，如果存在且通知没被看就不往里面添加了
             int count = userNoticeMapper.selectViewOrNot(userNotice);
             if(count < 1){
+                //设置事件id
+                userNotice.setIncidentId(id);
                 userNoticeMapper.insert(userNotice);
             }
         }
@@ -113,15 +122,17 @@ public class Inform {
             //根据评论事件的id找到事件的标题
             String title = incidentMapper.selectTitleById(incidentComment.getIncidentId());
             //设置通知标题
-            userNotice.setTitle(sessionUser.getNickName() + "，评论了你的事件：" + incidentComment.getComment());
+            userNotice.setTitle("你的发布的事件有了新的回复");
             //设置通知内容
-            userNotice.setContent(incidentComment.getComment());
+            userNotice.setContent(sessionUser.getNickName() + "，评论了你的事件，" + incidentComment.getComment());
+            //设置事件id
+            userNotice.setIncidentId(incidentComment.getIncidentId());
             userNoticeMapper.insert(userNotice);
         }
     }
 
     //二级评论后
-    @AfterReturning(value = "pointCutScndComment(incidentScndComment,sessionUser)",returning = "args", argNames = "incidentScndComment,sessionUser,args")
+    @AfterReturning(value = "pointCutScndComment(incidentScndComment, sessionUser)",returning = "args", argNames = "incidentScndComment,sessionUser,args")
     public void afterScndComment(IncidentScndComment incidentScndComment, User sessionUser, Object args){
         ServerResponse returning = (ServerResponse) args;
         short type = 22;
@@ -129,8 +140,18 @@ public class Inform {
             UserNotice userNotice = new UserNotice();
             //设置消息为未看
             userNotice.setView(0);
-            //设置被通知的id，也就是父id
-            userNotice.setUserId(incidentScndComment.getParScndCommentId());
+            //设置被通知的用户id
+            //此评论是评论二级评论的情况下
+            if (incidentScndComment.getParScndCommentId() != 0) {
+                Integer userId = incidentScndCommentMapper.selectUserIdById(incidentScndComment.getParScndCommentId());
+                userNotice.setUserId(userId);
+            }
+            //此评论是评论一级评论的情况下
+            else {
+                Integer userId = incidentCommentMapper.selectUserIdById(incidentScndComment.getIncidentCommentId());
+                userNotice.setUserId(userId);
+            }
+
             //设置通知标题
             userNotice.setTitle("你的评论有回复");
             //设置通知的类型
@@ -138,7 +159,9 @@ public class Inform {
             //设置二级评论者的id
             userNotice.setIncidentScndCommentId(sessionUser.getId());
             //设置通知内容
-            userNotice.setContent(sessionUser.getNickName() + "，回复了你："+incidentScndComment.getComment());
+            userNotice.setContent(sessionUser.getNickName() + "，回复了你，" + incidentScndComment.getComment());
+            //设置二级评论id
+            userNotice.setIncidentScndCommentId(incidentScndComment.getId());
             userNoticeMapper.insert(userNotice);
         }
     }

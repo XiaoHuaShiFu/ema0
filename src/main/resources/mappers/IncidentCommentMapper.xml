@@ -265,4 +265,11 @@
     ORDER BY create_time
     )
   </select>
+
+  <select id="selectUserIdById" parameterType="integer" resultType="integer">
+    SELECT
+    user_id
+    FROM incident_comment
+    WHERE id = #{incidentCommentId}
+  </select>
 </mapper>

@@ -25,4 +25,6 @@ public interface IncidentScndCommentMapper {
     int incrThumbUps(@Param("iscId") Integer iscId, @Param("userId") Integer userId);
 
     int decrThumbUps(@Param("iscId") Integer iscId, @Param("userId") Integer userId);
+
+    Integer selectUserIdById(Integer parScndCommentId);
 }

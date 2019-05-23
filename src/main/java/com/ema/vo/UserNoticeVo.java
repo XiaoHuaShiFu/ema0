@@ -1,7 +1,5 @@
 package com.ema.vo;
 
-import java.util.Date;
-
 public class UserNoticeVo {
     private Integer id;
 

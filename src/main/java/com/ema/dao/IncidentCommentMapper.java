@@ -37,4 +37,6 @@ public interface IncidentCommentMapper {
     List<IncidentComment> selectByUserId(Integer userId);
 
     List<IncidentComment> selectByUserId0(Integer userId);
+
+    Integer selectUserIdById(Integer incidentCommentId);
 }
