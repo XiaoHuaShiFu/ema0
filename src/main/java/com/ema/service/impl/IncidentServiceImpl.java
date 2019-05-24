@@ -481,6 +481,9 @@ public class IncidentServiceImpl implements IIncidentService{
      * @return
      */
     private IncidentViewVo assembleIncidentViewVo(IncidentView incidentView, Incident incident) {
+        if (incidentView == null || incident == null) {
+            return null;
+        }
         IncidentViewVo incidentViewVo = new IncidentViewVo();
         incidentViewVo.setIncidentId(incidentView.getIncidentId());
         incidentViewVo.setIncidentTitle(incident.getTitle());
@@ -626,11 +629,14 @@ public class IncidentServiceImpl implements IIncidentService{
      * @return
      */
     private UserVo assembleUserVo(User user) {
-        UserVo userVo = new UserVo();
-        userVo.setId(user.getId());
-        userVo.setNickName(user.getNickName());
-        userVo.setAvatarUrl(user.getAvatarUrl());
-        return userVo;
+        if (user != null) {
+            UserVo userVo = new UserVo();
+            userVo.setId(user.getId());
+            userVo.setNickName(user.getNickName());
+            userVo.setAvatarUrl(user.getAvatarUrl());
+            return userVo;
+        }
+        return null;
     }
 
     /**
