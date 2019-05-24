@@ -33,7 +33,7 @@ public class IncidentScndCommentController {
      * 状态码1表示上传成功
      *
      * @param incidentScndComment 二级评论pojo
-     * @param session 会话
+     * @param session             会话
      * @return 如果上传成功返回二级评论id
      */
     @RequestMapping(value = "upload_comment.do")
@@ -51,8 +51,8 @@ public class IncidentScndCommentController {
      * 如果状态码为1表示失败
      *
      * @param incidentCommentId 一级评论id
-     * @param pageNum 页码
-     * @param pageSize 一页条数
+     * @param pageNum           页码
+     * @param pageSize          一页条数
      * @return 返回二级评论列表
      */
     @RequestMapping(value = "list.do")
@@ -68,8 +68,8 @@ public class IncidentScndCommentController {
      * 状态码0表示删除成功
      * 状态码1表示删除失败
      *
-     * @param id 二级评论的id
-     * @param session 会话
+     * @param id        二级评论的id
+     * @param session   会话
      * @param commentId 一级评论id
      * @return 返回带状态码的响应
      */
@@ -91,7 +91,7 @@ public class IncidentScndCommentController {
      *
      * 此接口如果已经点赞则取消点赞，未点赞则增加点赞
      *
-     * @param id 二级评论id
+     * @param id      二级评论id
      * @param session 会话
      * @return 带状态码的响应
      */
@@ -101,6 +101,6 @@ public class IncidentScndCommentController {
         if (sessionUser == null) {
             return ServerResponse.create(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
         }
-        return iIncidentScndCommentService.thumbUpComment(sessionUser.getId(),id);
+        return iIncidentScndCommentService.thumbUpComment(id, sessionUser.getId());
     }
 }

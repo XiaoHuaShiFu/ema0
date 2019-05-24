@@ -129,6 +129,7 @@ public class IncidentScndCommentServiceImpl implements IIncidentScndCommentServi
         //尝试让点赞数+1，如果此用户没有点赞过此二级评论的话
         int rowCount = incidentScndCommentMapper.incrThumbUps(id, userId);
         //如果点赞成功则把点赞的映射对加入数据库
+        System.out.println(rowCount);
         if (rowCount >= 1) {
             iscThumbUpMapper.insert(userId, id);
             return ServerResponse.create(

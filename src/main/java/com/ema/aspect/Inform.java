@@ -87,15 +87,16 @@ public class Inform {
             //根据关注事件的id找到发布者的id
             int user_id = incidentMapper.selectUserIdById(id);
             userNotice.setUserId(user_id);
-            //设置标题
-            userNotice.setTitle("用户关注了事件");
             //关注者的id
             userNotice.setFollowerId(userId);
             //根据关注者的id找到关注者的nickName
             String user_nickName = userMapper.selectNickNameById(userId);
             //根据关注事件的id找到事件的标题
             String title = incidentMapper.selectTitleById(id);
-            userNotice.setContent(user_nickName + "，关注了你的事件，" + title);
+            //设置标题
+            userNotice.setTitle(user_nickName + " 用户关注了事件");
+            //设置内容
+            userNotice.setContent(title);
             //关注后判断一下通知里是否已经存在这个消息，如果存在且通知没被看就不往里面添加了
             int count = userNoticeMapper.selectViewOrNot(userNotice);
             if (count < 1) {
@@ -124,9 +125,9 @@ public class Inform {
             //根据评论事件的id找到事件的标题
             String title = incidentMapper.selectTitleById(incidentComment.getIncidentId());
             //设置通知标题
-            userNotice.setTitle("你的发布的事件有了新的回复");
+            userNotice.setTitle(sessionUser.getNickName() + " 评论了你的事件");
             //设置通知内容
-            userNotice.setContent(sessionUser.getNickName() + "，评论了你的事件，" + incidentComment.getComment());
+            userNotice.setContent(title);
             //设置事件id
             userNotice.setIncidentId(incidentComment.getIncidentId());
             userNoticeMapper.insertSelective(userNotice);
@@ -155,13 +156,13 @@ public class Inform {
             }
 
             //设置通知标题
-            userNotice.setTitle("你的评论有回复");
+            userNotice.setTitle(sessionUser.getNickName() + " 回复了你:");
             //设置通知的类型
             userNotice.setType(type);
             //设置二级评论者的id
             userNotice.setIncidentScndCommentId(sessionUser.getId());
             //设置通知内容
-            userNotice.setContent(sessionUser.getNickName() + "，回复了你，" + incidentScndComment.getComment());
+            userNotice.setContent(incidentScndComment.getComment());
             //设置二级评论id
             userNotice.setIncidentScndCommentId(incidentScndComment.getId());
             userNoticeMapper.insertSelective(userNotice);
