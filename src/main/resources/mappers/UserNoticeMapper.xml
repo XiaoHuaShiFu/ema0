@@ -37,12 +37,12 @@
     insert into user_notice (id, user_id, view, type,
       notice_time, title, content,
       incident_id, follower_id, commenter_id,
-      incident_scnd_comment_id, create_time
+      incident_scnd_comment_id
       )
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{view,jdbcType=INTEGER}, #{type,jdbcType=SMALLINT},
       #{noticeTime,jdbcType=TIMESTAMP}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
       #{incidentId,jdbcType=INTEGER}, #{followerId,jdbcType=INTEGER}, #{commenterId,jdbcType=INTEGER},
-      #{incidentScndCommentId,jdbcType=INTEGER}, now()
+      #{incidentScndCommentId,jdbcType=INTEGER}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.ema.pojo.UserNotice" >
@@ -78,7 +78,6 @@
       <if test="incidentScndCommentId != null" >
         incident_scnd_comment_id,
       </if>
-        create_time
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -111,7 +110,6 @@
       <if test="incidentScndCommentId != null" >
         #{incidentScndCommentId,jdbcType=INTEGER},
       </if>
-      now()
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.ema.pojo.UserNotice" >
